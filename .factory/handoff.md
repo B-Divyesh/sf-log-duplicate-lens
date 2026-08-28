@@ -25,6 +25,7 @@ npm run pack:cli
 - The Rust labeled sample detects 20/20 intentional cross-stream groups (100%, target ≥90%) with 0 false-positive groups (target <5%).
 - `cargo clippy --workspace --all-targets -- -D warnings`: passed.
 - `npm run build`: passed; produces `target/release/log-duplicate-lens` (2.5 MB) and `dist/site/index.html`. Total static output is 196 KB; initial JS is 12.54 KB raw / 5.07 KB gzip, CSS is 18.09 KB raw / 4.77 KB gzip, and the hero is 94 KB WebP.
+- Fresh-clone reproduction: `npm ci && npm run build` passed from a new local clone and produced both expected artifacts.
 - `npm run pack:cli`: passed package and clean package verification; crate archive is 16.1 KB compressed. Registry publishing was not attempted.
 - `npm audit`: 0 vulnerabilities.
 - `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173 .factory/evidence`: passed with no console/page errors, title and `lang`, exactly one `h1`, a `main` landmark, and no missing image alt text.
