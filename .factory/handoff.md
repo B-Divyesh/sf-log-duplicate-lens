@@ -1,30 +1,58 @@
-# Log Duplicate Lens — review 5 handoff
+# Log Duplicate Lens — polish 5 handoff
 
 ## Outcome
 
-Review 5 is **FAIL** with four minor findings recorded in `.factory/review-5.md`. No product code was changed.
+All cumulative review findings are closed. Repair commit
+`d1e0bc035ef988d196588e6fc4fbe7bfff3fe578` is pushed to `origin/main` and
+was deployed as `dist/site/` through the configured static work order. Azure
+Static Web Apps deployment `a01fffbf-3cad-481a-bf54-16ff58e01543` completed
+successfully. The live product is <https://log-duplicate-lens.sociobot.in/>.
 
-Open findings:
+The round-five changes add two real browser claims, replace the vague impact
+wording, focus and announce all static routes, and make the generated 404 use
+the full shared footer. The warm mid-century instrument-panel identity remains
+unchanged.
 
-- F-5-1: browser retry-window behavior is shown but has no browser claim/test.
-- F-5-2: browser impact estimates are shown but unregistered and “Alert amplifier” is unclear.
-- F-5-3: legal/static route changes leave focus on `BODY` and do not announce the route.
-- F-5-4: generated 404 footer lacks the normal factory/version attribution.
+## Exact verification evidence
 
-## Verification performed
+- Clean clone: `/tmp/log-duplicate-lens-polish-5-clean-eN4G6M/repo` at
+  `d1e0bc0`; `npm ci` completed with zero vulnerabilities.
+- Every one of the 25 commands in `.factory/claims.json` passed independently.
+  Transcript: `/tmp/log-duplicate-lens-polish-5-claims.log`.
+- Full clean-clone gate passed: `npm test` (18 Rust, 4 Vitest, 52 Playwright),
+  `npm run build`, `npm run pack:cli`, and `npm run test:performance`.
+  Transcript: `/tmp/log-duplicate-lens-polish-5-full-clean.log`.
+- Clean-clone Lighthouse: performance 99, accessibility 100, best practices
+  100, SEO 100; FCP 0.9 s, LCP 1.4 s, TBT 130 ms, CLS 0. The local repeat was
+  100/100/100/100 with LCP 1.2 s.
+- Local URL verifier passed for `/` and `/demo` with no console errors, one
+  h1/main, `lang`, alt coverage, and labeled controls:
+  `/tmp/log-duplicate-lens-polish-5-local-Tq2nx7/`.
+- Cold live URL verifier passed for `/`, `/demo`, `/privacy/`, and `/terms/`.
+  Evidence: `/tmp/log-duplicate-lens-polish-5-live-pRfMxB/{root,demo,privacy,terms}/`.
+- Cold live audit passed: one-click and query demo, storage isolation, Reset,
+  Start for real, offline reset, 390 px bounds, both browser metric claims,
+  legal/404 focus and route announcements, shared 404 footer, metadata, link
+  crawl, and aXe. JSON: `/tmp/log-duplicate-lens-polish-5-live-pRfMxB/audit/live-audit.json`.
+  Screenshots include `live-demo-mobile.png`, `live-query-demo.png`,
+  `live-retry-window.png`, `live-impact-estimates.png`,
+  `live-privacy-focus.png`, and `live-404-focus.png` in that audit directory.
 
-- Cold live mobile (390 x 844) and desktop checks; first-read job, audience, and first action are clear.
-- Live demo one-click result, banner, Reset, Start-for-real, storage isolation, same-origin interception, and offline Reset checks passed.
-- The CLI demo ran from a new temporary directory and wrote a temporary report.
-- Clean clone `/tmp/log-duplicate-lens-review5-DzngYe/repo`: `npm ci`, all 23 exact `.factory/claims.json` commands, `npm test`, and `npm run build` passed. The individual-claim transcript is `/tmp/log-duplicate-lens-review5-claims.log`.
-- Live route metadata/h1/main checks, link crawl, HTTP 404, Back focus, and headers were checked. All rendered HTTP links returned 200; explicit mailto links were retained.
+## Run and verify
 
-## How to verify repairs
-
-~~~sh
+```sh
 npm ci
 npm test
 npm run build
-~~~
+npm run pack:cli
+npm run test:performance
+```
 
-Run every exact command in `.factory/claims.json` independently from a clean clone. Add tests for F-5-1 and F-5-2, then verify Home -> Privacy -> Terms and the 404 entry move focus to the new h1 and announce the route. Confirm the 404 footer reads “Built by Param Factory · v0.1.0”.
+Run each exact `test` command in `.factory/claims.json` separately for the
+claims matrix. Deploy the already-built `dist/site/` using the factory static
+work order. The CLI is ready to publish but is not published by this worker;
+use `npm run pack:cli` to produce the verified crate package.
+
+## Known gaps
+
+None.
