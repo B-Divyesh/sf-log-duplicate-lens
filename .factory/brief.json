@@ -1,0 +1,9 @@
+{
+  "slug": "log-duplicate-lens",
+  "title": "Log Duplicate Lens",
+  "artifact_class": "cli",
+  "user": "Operators of Loki or JSON log pipelines who need to quantify accidental duplicate ingestion across streams before it distorts search results, alert counts, and storage cost.",
+  "smallest_useful_product": "A CLI that samples Loki JSON exports or newline-delimited logs, fingerprints messages with configurable timestamp tolerance, groups cross-stream near-duplicates, estimates volume/alert inflation, and emits label/retry evidence.",
+  "constraints": "Sample and process locally; support redaction before reports; do not infer that identical messages are erroneous without presenting the stream/retry evidence; handle high-cardinality inputs with bounded memory.",
+  "monetization": "one-time"
+}
