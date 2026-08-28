@@ -248,6 +248,8 @@ test("routes expose separate titles and a designed not-found page", async ({ pag
   await expect(page.getByRole("heading", { name: "2 suspected duplicate groups" })).toBeFocused();
   await page.goBack();
   await expect(page).toHaveTitle("Log Duplicate Lens — find duplicate Loki logs");
+  await expect(page.locator("#route-announcer")).toHaveText("Log Duplicate Lens — find duplicate Loki logs");
+  await expect(page.getByRole("heading", { name: "Find duplicate Loki logs across streams" })).toBeFocused();
   await page.goto("/privacy/");
   await expect(page).toHaveTitle("Privacy — Log Duplicate Lens");
   await expect(page.getByRole("link", { name: "Terms" }).first()).toHaveAttribute("href", "/terms/");

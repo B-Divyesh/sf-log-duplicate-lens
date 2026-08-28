@@ -1,4 +1,4 @@
-# Copy audit — polish 3
+# Copy audit — polish 4
 
 Checked 2026-08-28. Counts treat hyphenated terms, options, and version strings
 as one word. No visitor-facing sentence exceeds 22 words. No text uses the
@@ -109,5 +109,5 @@ product capability.
 | Built-in trial data | sample |
 | Long changing number within a message | request ID |
 
-The catalog sentence is 88 characters before its newline, starts with “Find,”
+The catalog sentence is 83 characters before its newline, starts with “Find,”
 and stays below the 120-character limit.

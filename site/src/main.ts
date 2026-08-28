@@ -173,6 +173,21 @@ function updateNetwork(): void {
 }
 window.addEventListener("online", updateNetwork); window.addEventListener("offline", updateNetwork); updateNetwork();
 
+function restoreHomeRouteFocus(event: PageTransitionEvent): void {
+  if (isDemo) return;
+  const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+  if (!event.persisted && navigation?.type !== "back_forward") return;
+
+  const heading = byId("hero-title");
+  heading.focus({ preventScroll: true });
+  byId("route-announcer").textContent = "Log Duplicate Lens — find duplicate Loki logs";
+}
+
+// A demo opens as a separate document so native Back can use either a fresh
+// load or the back/forward cache. `pageshow` covers both paths and returns a
+// keyboard or screen-reader visitor to a meaningful home-route landmark.
+window.addEventListener("pageshow", restoreHomeRouteFocus);
+
 if (isDemo) {
   document.body.classList.add("demo-mode");
   setDemoHeadingOutline();
