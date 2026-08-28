@@ -1,5 +1,23 @@
 # Log Duplicate Lens v0.1.0 — handoff
 
+## Review-1 reviewer handoff — FAIL (2026-08-28)
+
+This reviewer made no product-code changes. The adversarial review is recorded
+in `.factory/review-1.md` and supersedes the acceptance conclusion for this
+work order.
+
+- Live review: fresh desktop and 390 px browser contexts; sample, `?demo=1`,
+  offline, storage, routes, metadata, and link checks.
+- Clean-clone verification at `18cf12960417d3bd0d6a33a7a5de794bc650d8ab`:
+  `npm ci`, `npm test` (10 Rust, 4 Vitest, 12 Playwright), and `npm run build`
+  passed.
+- Blocking gaps: no one-click isolated demo or CLI demo command/sample, no
+  `.factory/claims.json`, dead checkout (HTTP 404), fake `/demo` and no 404,
+  plus first-screen/copy failures.
+
+Next step: repair every blocking finding in `.factory/review-1.md`, then run
+its required fresh-clone and fresh-browser verification list before re-review.
+
 ## Independent verification 2 — PASS (2026-08-28)
 
 **Tested candidate:** `f9b952a9fddfd87aa1eae64736affb4bb6d8c0ff`
