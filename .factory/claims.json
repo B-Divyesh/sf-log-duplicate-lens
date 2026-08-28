@@ -1,51 +1,21 @@
 [
-  {
-    "id": "sample-analysis",
-    "claim": "The sample shows two suspected duplicate groups and three duplicate copies",
-    "where": "landing action, demo readout",
-    "test": "npx playwright test --project=chromium --grep @claim:sample-analysis",
-    "sandbox": "fresh browser context opens /demo and observes the bundled result"
-  },
-  {
-    "id": "demo-isolation",
-    "claim": "Demo sample data is not saved with normal data",
-    "where": "demo banner, README, privacy",
-    "test": "npx playwright test --project=chromium --grep @claim:demo-isolation",
-    "sandbox": "fresh /demo context asserts only the demo: storage key exists before and after reset"
-  },
-  {
-    "id": "demo-private",
-    "claim": "The demo makes no off-origin requests",
-    "where": "privacy notice",
-    "test": "npx playwright test --project=chromium --grep @claim:demo-private",
-    "sandbox": "fresh /demo context records every request and permits only the local origin"
-  },
-  {
-    "id": "json-export",
-    "claim": "The demo exports its observed report as JSON",
-    "where": "Export JSON evidence button",
-    "test": "npx playwright test --project=chromium --grep @claim:json-export",
-    "sandbox": "fresh /demo context downloads the report and asserts its observed groups and copies"
-  },
-  {
-    "id": "browser-limit",
-    "claim": "The browser reads up to 5 MB",
-    "where": "landing workbench",
-    "test": "npx playwright test --project=chromium --grep @claim:browser-limit",
-    "sandbox": "fresh home context selects a 5 MB plus one byte file and observes the limit error"
-  },
-  {
-    "id": "offline-demo",
-    "claim": "The browser demo can run offline after the site has loaded",
-    "where": "privacy notice",
-    "test": "npx playwright test --project=chromium --grep @claim:offline-demo",
-    "sandbox": "fresh /demo context goes offline after first load, resets, and observes the result"
-  },
-  {
-    "id": "cli-demo",
-    "claim": "The CLI demo reads a bundled seven-record sample and writes a temporary report",
-    "where": "landing CLI demo, README",
-    "test": "cargo test --test cli claim_cli_demo_runs_without_an_input_path",
-    "sandbox": "test binary runs log-duplicate-lens demo with no input path and observes its sample/result/output-path text"
-  }
+  {"id":"sample-analysis","claim":"The sample shows two suspected duplicate groups and three duplicate copies.","where":"landing action, demo readout","test":"npx playwright test --project=chromium --grep @claim:sample-analysis","sandbox":"Fresh browser context opens /demo and observes the bundled result."},
+  {"id":"demo-mobile-result","claim":"One click opens the sample result with the demo notice visible on a phone.","where":"landing action, demo banner","test":"npx playwright test --project=chromium --grep @claim:demo-mobile-result","sandbox":"Fresh 390 px browser clicks the landing action and measures the banner and result inside the viewport."},
+  {"id":"demo-isolation","claim":"Demo sample data is not saved with normal data; leaving demo removes its marker.","where":"demo banner, README, privacy notice","test":"npx playwright test --project=chromium --grep @claim:demo-isolation","sandbox":"Fresh /demo context checks the demo: key after reset and its removal after Start for real."},
+  {"id":"demo-private","claim":"The demo makes no off-origin requests.","where":"privacy notice","test":"npx playwright test --project=chromium --grep @claim:demo-private","sandbox":"Fresh /demo context records every request and permits only the local origin."},
+  {"id":"json-export","claim":"The demo exports its observed report as JSON.","where":"Export JSON evidence button","test":"npx playwright test --project=chromium --grep @claim:json-export","sandbox":"Fresh /demo context downloads the report and asserts its observed groups and copies."},
+  {"id":"browser-limit","claim":"The browser reads up to 5 MB.","where":"landing workbench","test":"npx playwright test --project=chromium --grep @claim:browser-limit","sandbox":"Fresh home context selects a 5 MB plus one byte file and observes the limit error."},
+  {"id":"offline-demo","claim":"The browser demo can run offline after the site has loaded.","where":"privacy notice","test":"npx playwright test --project=chromium --grep @claim:offline-demo","sandbox":"Fresh /demo context goes offline after first load, resets, and observes the result."},
+  {"id":"browser-local-processing","claim":"The browser processes pasted and selected samples locally.","where":"landing assurance, privacy notice","test":"npx playwright test --project=chromium --grep @claim:browser-local-processing","sandbox":"Fresh demo context analyzes pasted and selected JSONL while request interception allows only the local origin."},
+  {"id":"browser-input-formats","claim":"The browser accepts JSON lines, Loki responses, and plain lines.","where":"browser workbench","test":"npx playwright test --project=chromium --grep @claim:browser-input-formats","sandbox":"Fresh demo context analyzes fixtures in all three listed input forms."},
+  {"id":"site-privacy","claim":"This site uses no analytics, tracking pixels, advertising cookies, third-party fonts, or runtime content delivery networks.","where":"privacy notice","test":"npx playwright test --project=chromium --grep @claim:site-privacy","sandbox":"Fresh root context asserts only same-origin requests and empty local/session storage and cookies."},
+  {"id":"cli-demo","claim":"The CLI demo reads a bundled seven-record sample and writes a temporary report.","where":"landing CLI demo, README","test":"cargo test --test cli claim_cli_demo_runs_without_an_input_path","sandbox":"Test binary runs log-duplicate-lens demo with no input path and observes its sample, result, and output-path text."},
+  {"id":"cli-detection","claim":"The CLI finds suspected duplicate Loki logs across streams.","where":"README, landing footer","test":"cargo test --test cli claim_cli_detection_finds_cross_stream_duplicates","sandbox":"Test binary analyzes a two-stream JSONL fixture and observes one group and the documented nonzero duplicate exit code."},
+  {"id":"cli-json","claim":"The CLI emits a machine-readable JSON report with --json.","where":"landing CLI notes, README","test":"cargo test --test cli claim_cli_json_emits_a_machine_readable_report","sandbox":"Test binary parses --json output from a two-stream fixture."},
+  {"id":"report-evidence","claim":"Each suspected duplicate group reports its message, retry timing, and stream labels.","where":"README","test":"cargo test --test cli claim_report_evidence_includes_message_timing_and_stream_labels","sandbox":"Test binary parses a fixture report and checks all three evidence fields."},
+  {"id":"cli-loki-format","claim":"The CLI reads a Loki query response with --format loki.","where":"README","test":"cargo test --test cli claim_cli_loki_format_reads_a_query_response","sandbox":"Test binary analyzes a Loki response fixture and checks the reported format and group."},
+  {"id":"cli-retry-window","claim":"The CLI retry window changes which events match.","where":"README","test":"cargo test --test cli claim_cli_retry_window_changes_which_events_match","sandbox":"Test binary compares a 1500 ms and 2 s run against the same boundary fixture."},
+  {"id":"cli-limits","claim":"The CLI applies --max-events, --max-groups, and --max-input-mb limits.","where":"landing CLI notes, README","test":"cargo test --test cli claim_cli_limits_apply_to_events_groups_and_input_size","sandbox":"Test binary observes event sampling and rejects zero group and input limits."},
+  {"id":"cli-redaction","claim":"The CLI redacts matching secret text from a shared report preview.","where":"README","test":"cargo test --test cli claim_cli_redaction_removes_a_secret_from_the_report","sandbox":"Test binary checks that a fixture secret is absent and its replacement is present."},
+  {"id":"cli-local-processing","claim":"The CLI reads logs on your machine without a network connection.","where":"privacy notice","test":"cargo test --test cli claim_cli_local_processing_runs_with_an_unusable_proxy","sandbox":"Test binary completes a local fixture analysis with unusable HTTP and HTTPS proxy settings."}
 ]

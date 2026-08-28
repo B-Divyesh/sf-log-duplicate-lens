@@ -8,15 +8,17 @@
     <meta property="og:title" content="Log Duplicate Lens — find duplicate Loki logs" />
     <meta property="og:description" content="Find duplicate Loki logs across streams before they inflate alerts and storage." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://log-duplicate-lens.sociobot.in/lens-cutaway.webp" />
+    <meta property="og:image" content="https://log-duplicate-lens.sociobot.in/social-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Log Duplicate Lens — find duplicate Loki logs" />
     <meta name="twitter:description" content="Find duplicate Loki logs across streams before they inflate alerts and storage." />
-    <meta name="twitter:image" content="https://log-duplicate-lens.sociobot.in/lens-cutaway.webp" />
+    <meta name="twitter:image" content="https://log-duplicate-lens.sociobot.in/social-card.png" />
     <link rel="canonical" href="https://log-duplicate-lens.sociobot.in/" />
     <title>Log Duplicate Lens — find duplicate Loki logs</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preload" href="/lens-cutaway-640.webp" as="image" type="image/webp" media="(max-width: 940px)" fetchpriority="high" />
     <link rel="preload" href="/lens-cutaway.webp" as="image" type="image/webp" media="(min-width: 941px)" fetchpriority="high" />
@@ -79,7 +81,7 @@
       <section class="calibration-band" aria-label="How Lens works">
         <ol>
           <li><span>01</span><strong>Read messages</strong><small>Hide changing IDs</small></li>
-          <li><span>02</span><strong>Set a time window</strong><small>Match retry timing</small></li>
+          <li><span>02</span><strong>Set a retry window</strong><small>Match retry timing</small></li>
           <li><span>03</span><strong>Compare streams</strong><small>Show differing labels</small></li>
           <li><span>04</span><strong>Inspect groups</strong><small>Review duplicate evidence</small></li>
         </ol>
@@ -106,7 +108,7 @@
             </div>
 
             <fieldset class="window-control">
-              <legend>Timestamp tolerance</legend>
+              <legend>Retry window</legend>
               <div class="window-options">
                 <label><input type="radio" name="window" value="500" /><span>0.5 s</span></label>
                 <label><input type="radio" name="window" value="2000" checked /><span>2 s</span></label>
@@ -167,7 +169,7 @@
           <div class="terminal-top"><span>LOCAL / OPERATOR</span><span>UTF-8</span></div>
           <pre><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-log-duplicate-lens
 log-duplicate-lens demo</code></pre>
-          <button class="copy-button" id="copy-button" type="button" aria-label="Copy install command">Copy command</button>
+          <button class="copy-button" id="copy-button" type="button">Copy install command</button>
         </div>
         <div class="cli-notes">
           <p><strong>Demo:</strong> uses the bundled seven-record sample and writes a temporary report.</p>

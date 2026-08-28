@@ -18,6 +18,26 @@ test("@claim:demo-isolation demo stores no normal application data and reset kee
   await page.getByRole("button", { name: "Reset demo" }).click();
   await expect(page.locator("#metric-copies")).toHaveText("3");
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(["demo:log-duplicate-lens:active"]);
+  await page.getByRole("button", { name: "Start for real" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
+});
+
+test("@claim:demo-mobile-result a sample click keeps the sandbox notice and result in a 390px viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.getByRole("link", { name: "Try it with sample data" }).click();
+  await expect(page).toHaveURL(/\/demo$/);
+  const banner = page.getByLabel("Demo controls");
+  const result = page.getByRole("heading", { name: "2 suspected duplicate groups" });
+  await expect(banner).toBeVisible();
+  await expect(result).toBeVisible();
+  for (const locator of [banner, result]) {
+    const box = await locator.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.y).toBeGreaterThanOrEqual(0);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(844);
+  }
 });
 
 test("@claim:demo-private demo sends no off-origin requests", async ({ page }) => {
@@ -60,6 +80,54 @@ test("@claim:offline-demo demo analyzes after its first visit while offline", as
   await expect(page.locator("#metric-copies")).toHaveText("3");
 });
 
+test("@claim:browser-local-processing pasted and selected samples produce a report without an off-origin request", async ({ page }) => {
+  const offOrigin: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).origin !== "http://127.0.0.1:4173") offOrigin.push(request.url());
+  });
+  const events = [
+    { ts: "2026-08-28T02:14:06.000Z", msg: "payment retry id=12345", stream: { shard: "a" } },
+    { ts: "2026-08-28T02:14:06.200Z", msg: "payment retry id=67890", stream: { shard: "b" } }
+  ];
+  const jsonl = events.map((event) => JSON.stringify(event)).join("\n");
+  await page.goto("/demo");
+  await page.locator("#log-input").fill(jsonl);
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.locator("#metric-copies")).toHaveText("1");
+  await page.locator("#file-input").setInputFiles({ name: "local.jsonl", mimeType: "application/x-ndjson", buffer: Buffer.from(jsonl) });
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.locator("#metric-copies")).toHaveText("1");
+  expect(offOrigin).toEqual([]);
+});
+
+test("@claim:browser-input-formats browser accepts JSON lines, a Loki response, and plain lines", async ({ page }) => {
+  const jsonl = [
+    { ts: 1_700_000_000_000, msg: "cache retry 12345", stream: { shard: "a" } },
+    { ts: 1_700_000_000_100, msg: "cache retry 67890", stream: { shard: "b" } }
+  ].map((event) => JSON.stringify(event)).join("\n");
+  const loki = JSON.stringify({ data: { result: [
+    { stream: { shard: "a" }, values: [["1700000000000000000", "cache retry 12345"]] },
+    { stream: { shard: "b" }, values: [["1700000000100000000", "cache retry 67890"]] }
+  ] } });
+  await page.goto("/demo");
+  for (const [value, copies] of [[jsonl, "1"], [loki, "1"], ["one plain line\ntwo plain line", "0"]] as const) {
+    await page.locator("#log-input").fill(value);
+    await page.getByRole("button", { name: "Analyze this sample" }).click();
+    await expect(page.locator("#readout-state")).not.toHaveText("Input error");
+    await expect(page.locator("#metric-copies")).toHaveText(copies);
+  }
+});
+
+test("@claim:site-privacy site loads without third-party requests or persistent browser storage", async ({ page }) => {
+  const offOrigin: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).origin !== "http://127.0.0.1:4173") offOrigin.push(request.url());
+  });
+  await page.goto("/");
+  expect(offOrigin).toEqual([]);
+  expect(await page.evaluate(() => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage), cookie: document.cookie }))).toEqual({ local: [], session: [], cookie: "" });
+});
+
 test("explains malformed input and restores focus", async ({ page }) => {
   await page.goto("/");
   await page.locator("#log-input").fill("{not-json");
@@ -81,6 +149,25 @@ test("fits a 390px viewport with Demo and Privacy navigation", async ({ page }) 
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   await expect(page.getByRole("link", { name: "Demo" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Privacy" }).first()).toBeVisible();
+});
+
+test("uses Retry window and Copy install command consistently", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("Set a retry window")).toBeVisible();
+  await expect(page.getByRole("group", { name: "Retry window" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Copy install command" })).toBeVisible();
+});
+
+test("ships local touch and social assets with their declared dimensions", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /social-card\.png$/);
+  const touch = await page.request.get("/apple-touch-icon.png");
+  const social = await page.request.get("/social-card.png");
+  expect(touch.status()).toBe(200); expect(social.status()).toBe(200);
+  const pngSize = (body: Buffer) => [body.readUInt32BE(16), body.readUInt32BE(20)];
+  expect(pngSize(Buffer.from(await touch.body()))).toEqual([180, 180]);
+  expect(pngSize(Buffer.from(await social.body()))).toEqual([1200, 630]);
 });
 
 test("routes expose separate titles and a designed not-found page", async ({ page }) => {

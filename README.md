@@ -34,7 +34,7 @@ log-duplicate-lens loki.jsonl
 ```
 
 Use `--format loki` for a Loki query response. Use `--window 1500ms` to set
-the matching time window. Add `--json` for a machine-readable report.
+the retry window. Add `--json` for a machine-readable report.
 
 ```sh
 log-duplicate-lens export.json --format loki --window 1500ms --json
@@ -67,8 +67,8 @@ order. `npm run pack:cli` prepares a crate but does not publish it.
 
 ## Privacy and license
 
-The browser demo uses its own `demo:` local-storage key. It removes that key
-when you leave the demo. See the [privacy notice](https://log-duplicate-lens.sociobot.in/privacy/)
+The browser demo uses its own `demo:` local-storage key. Resetting reruns the
+sample. Leaving the demo removes that key. See the [privacy notice](https://log-duplicate-lens.sociobot.in/privacy/)
 and [terms](https://log-duplicate-lens.sociobot.in/terms/).
 
 MIT © 2026 Sociobot (Param Factory). See [LICENSE](LICENSE).

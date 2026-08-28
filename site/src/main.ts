@@ -66,6 +66,13 @@ function runAnalysis(): void {
       renderReport(currentReport);
       setReadoutState(currentReport.suspectedGroups ? "Evidence found" : "No cross-stream matches", false);
       exportButton.disabled = false;
+      if (isDemo) {
+        window.setTimeout(() => {
+          const heading = document.getElementById("result-heading");
+          heading?.scrollIntoView({ block: "start" });
+          heading?.focus({ preventScroll: true });
+        }, 0);
+      }
     } catch (error) {
       currentEvents = [];
       currentReport = null;
@@ -96,7 +103,7 @@ byId("copy-button").addEventListener("click", async (event) => {
     await navigator.clipboard.writeText(byId("install-command").textContent ?? "");
     button.textContent = "Copied";
   } catch { button.textContent = "Select command above"; }
-  window.setTimeout(() => (button.textContent = "Copy command"), 1800);
+  window.setTimeout(() => (button.textContent = "Copy install command"), 1800);
 });
 
 function renderReport(report: DemoReport): void {
@@ -110,6 +117,8 @@ function renderReport(report: DemoReport): void {
   const evidence = byId("evidence");
   evidence.replaceChildren();
   const title = document.createElement("h3");
+  title.id = "result-heading";
+  title.tabIndex = -1;
   title.textContent = `${report.groups.length} suspected duplicate ${report.groups.length === 1 ? "group" : "groups"}`;
   evidence.append(title);
   report.groups.slice(0, 8).forEach((group, index) => {
@@ -136,14 +145,13 @@ function updateNetwork(): void {
 window.addEventListener("online", updateNetwork); window.addEventListener("offline", updateNetwork); updateNetwork();
 
 if (isDemo) {
+  document.body.classList.add("demo-mode");
   localStorage.setItem(DEMO_KEY, "active");
   byId("demo-banner").hidden = false;
   document.title = "Demo — Log Duplicate Lens";
   document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute("href", "https://log-duplicate-lens.sociobot.in/demo");
   byId("route-announcer").textContent = "Demo — Log Duplicate Lens";
-  window.setTimeout(() => byId("hero-title").focus(), 0);
   loadSample(true);
-  window.setTimeout(() => byId("workbench").scrollIntoView({ block: "start" }), 0);
 }
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => undefined));

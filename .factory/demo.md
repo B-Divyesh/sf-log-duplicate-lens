@@ -11,5 +11,6 @@ temporary directory and prints the path.
 
 The browser demo uses only the localStorage key
 demo:log-duplicate-lens:active. It does not read normal application storage.
-**Reset demo** reruns the bundled sample. **Start for real** removes every
-demo-prefixed key and returns to the normal workbench.
+**Reset demo** reruns the bundled sample and keeps the active demo marker.
+**Start for real** removes every demo-prefixed key and returns to the normal
+workbench.

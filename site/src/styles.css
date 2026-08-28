@@ -184,6 +184,37 @@ footer nav {
   font-size: 13px;
 }
 
+/* The demo is an active instrument state. Its safety notice must remain in
+   view while a visitor inspects the supplied result. */
+.demo-mode .demo-banner {
+  position: sticky;
+  z-index: 20;
+  top: 8px;
+}
+
+.demo-mode .hero,
+.demo-mode .calibration-band {
+  display: none;
+}
+
+.demo-mode .workbench-section {
+  padding-top: 32px;
+}
+
+.demo-mode .workbench {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-mode .output-bay {
+  order: -1;
+  border-bottom: 1px solid rgb(23 32 29 / 0.26);
+}
+
+#result-heading {
+  scroll-margin-top: 112px;
+}
+
 .demo-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1289,6 +1320,34 @@ footer nav a {
     width: calc(100% - 32px);
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .demo-mode .demo-banner {
+    top: 4px;
+  }
+
+  .demo-mode .workbench-section {
+    padding: 24px 16px 64px;
+  }
+
+  .demo-mode .section-heading {
+    margin-bottom: 20px;
+  }
+
+  .demo-mode .section-heading h2 {
+    font-size: 2rem;
+  }
+
+  .demo-mode .readout {
+    min-height: 0;
+  }
+
+  .demo-mode .evidence {
+    max-height: 260px;
+  }
+
+  #result-heading {
+    scroll-margin-top: 132px;
   }
 
   .assurance-list {
