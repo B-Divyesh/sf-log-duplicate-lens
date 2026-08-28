@@ -65,7 +65,7 @@ npm run test:performance
 in `dist/site/`. Deploy `dist/site/` with the factory static deploy work
 order. `npm run pack:cli` prepares a crate but does not publish it.
 
-## Privacy and license
+## Privacy and software license
 
 The browser demo uses its own `demo:` local-storage key. Resetting reruns the
 sample. Leaving the demo removes that key. See the [privacy notice](https://log-duplicate-lens.sociobot.in/privacy/)
