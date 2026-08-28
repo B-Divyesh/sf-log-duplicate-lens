@@ -1,0 +1,10 @@
+{
+  "name": "Log Duplicate Lens",
+  "short_name": "Duplicate Lens",
+  "description": "Local cross-stream duplicate log investigation",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3e9d2",
+  "theme_color": "#202a27",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

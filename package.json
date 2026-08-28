@@ -1,0 +1,23 @@
+{
+  "name": "log-duplicate-lens-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "cargo build --release && npm run build:site",
+    "build:site": "tsc --noEmit && vite build",
+    "test": "cargo test --workspace && vitest run src/analyzer.test.ts --globals && playwright test",
+    "test:unit": "cargo test --workspace && vitest run src/analyzer.test.ts --globals",
+    "test:e2e": "playwright test",
+    "pack:cli": "cargo package -p log-duplicate-lens --allow-dirty"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.58.2",
+    "@types/node": "22.12.0",
+    "typescript": "5.9.2",
+    "vite": "7.3.6",
+    "vitest": "3.2.7"
+  }
+}

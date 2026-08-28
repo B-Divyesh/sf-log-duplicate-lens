@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#202a27" />
+    <meta name="description" content="Measure suspected duplicate log ingestion across Loki streams locally, before it inflates alerts and storage." />
+    <title>Log Duplicate Lens — see cross-stream log amplification</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" href="/lens-cutaway.webp" as="image" type="image/webp" fetchpriority="high" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="network-strip" id="network-strip" role="status">
+      <span class="status-lamp" aria-hidden="true"></span>
+      <span id="network-label">Local circuit ready · nothing uploaded</span>
+    </div>
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="Log Duplicate Lens home">
+        <svg aria-hidden="true" viewBox="0 0 42 42" width="42" height="42">
+          <circle cx="21" cy="21" r="18" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M9 14h11l5 7-5 7H9M33 14H23l-5 7 5 7h10" fill="none" stroke="currentColor" stroke-width="2.4" />
+          <circle cx="21" cy="21" r="3" fill="#f2a43b" />
+        </svg>
+        <span>Log Duplicate Lens<small>Local diagnostic · 0.1.0</small></span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#workbench">Try the lens</a>
+        <a href="#install">Install</a>
+        <a href="#field-kit">Field Kit</a>
+        <a class="nav-cta" href="https://github.com/B-Divyesh/sf-log-duplicate-lens">Source</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>Instrument 04</span> Cross-stream amplification</p>
+          <h1 id="hero-title">Find the copies your stream labels hide.</h1>
+          <p class="lede">Sample a Loki export. Lens groups near-identical messages across streams, measures the likely volume and alert inflation, and shows the label and retry evidence to investigate next.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#workbench">Analyze a sample</a>
+            <a class="button button-secondary" href="#install">Install the CLI</a>
+          </div>
+          <ul class="assurance-list" aria-label="Product assurances">
+            <li><span aria-hidden="true">●</span> Local-only processing</li>
+            <li><span aria-hidden="true">●</span> Explicit memory bounds</li>
+            <li><span aria-hidden="true">●</span> Evidence, not verdicts</li>
+          </ul>
+        </div>
+        <figure class="hero-instrument">
+          <img src="/lens-cutaway.webp" width="1280" height="853" alt="Cutaway illustration of three log signal traces converging through a lens into one paper-chart pulse" fetchpriority="high" />
+          <figcaption>Three observed stream traces · one probable logical event</figcaption>
+        </figure>
+      </section>
+
+      <section class="calibration-band" aria-label="How Lens works">
+        <ol>
+          <li><span>01</span><strong>Fingerprint</strong><small>Normalize noisy IDs</small></li>
+          <li><span>02</span><strong>Calibrate</strong><small>Set retry tolerance</small></li>
+          <li><span>03</span><strong>Cross-check</strong><small>Compare stream labels</small></li>
+          <li><span>04</span><strong>Quantify</strong><small>Estimate amplification</small></li>
+        </ol>
+      </section>
+
+      <section class="workbench-section" id="workbench" aria-labelledby="workbench-title">
+        <div class="section-heading">
+          <p class="eyebrow">Bench test · browser edition</p>
+          <h2 id="workbench-title">Run a bounded investigation</h2>
+          <p>Paste JSONL, a Loki <code>query_range</code> response, or plain lines. This browser edition reads at most 5 MB and never sends the content anywhere.</p>
+        </div>
+
+        <div class="workbench">
+          <div class="input-bay">
+            <div class="bay-label"><span>Input A</span><span class="privacy-scope">Local circuit</span></div>
+            <label for="log-input">Log sample</label>
+            <textarea id="log-input" spellcheck="false" aria-describedby="input-help input-error" placeholder='{"ts": 1700000000000, "msg": "timeout id=12345", "stream": {"shard": "a"}}'></textarea>
+            <p class="field-help" id="input-help">Secrets remain on this device. Redact sensitive values before sharing exported evidence.</p>
+            <p class="field-error" id="input-error" role="alert" hidden></p>
+            <div class="input-actions">
+              <button class="button button-secondary" type="button" id="sample-button">Load labeled sample</button>
+              <input id="file-input" type="file" accept=".json,.jsonl,.ndjson,.log,.txt,application/json,text/plain" />
+              <label class="button button-quiet file-button" for="file-input">Choose file</label>
+            </div>
+
+            <fieldset class="window-control">
+              <legend>Timestamp tolerance</legend>
+              <div class="window-options">
+                <label><input type="radio" name="window" value="500" /><span>0.5 s</span></label>
+                <label><input type="radio" name="window" value="2000" checked /><span>2 s</span></label>
+                <label><input type="radio" name="window" value="5000" /><span>5 s</span></label>
+              </div>
+            </fieldset>
+            <button class="analyze-key" id="analyze-button" type="button"><span aria-hidden="true">▶</span> Analyze locally</button>
+          </div>
+
+          <div class="output-bay" aria-labelledby="readout-title">
+            <div class="bay-label"><span id="readout-title">Readout B</span><span id="readout-state">Awaiting sample</span></div>
+            <div class="readout" id="results" aria-live="polite" aria-busy="false">
+              <div class="empty-readout" id="empty-readout">
+                <svg aria-hidden="true" viewBox="0 0 280 90">
+                  <path class="trace trace-a" d="M2 16h60l18 28h42" />
+                  <path class="trace trace-b" d="M2 45h120" />
+                  <path class="trace trace-c" d="M2 74h60l18-29h42" />
+                  <circle cx="140" cy="45" r="18" />
+                  <path class="trace output-trace" d="M158 45h40l8-16 12 34 11-18h49" />
+                </svg>
+                <strong>No sample on the bench</strong>
+                <p>Load the labeled example or choose a bounded production export.</p>
+              </div>
+              <div class="metrics" id="metrics" hidden>
+                <div class="meter meter-primary"><span>Suspected copies</span><strong id="metric-copies">0</strong><small id="metric-percent">0% of sample</small></div>
+                <div class="meter"><span>Alert amplifier</span><strong id="metric-alert">1.00×</strong><small>if each copy fires</small></div>
+                <div class="meter"><span>Extra bytes</span><strong id="metric-bytes">0 B</strong><small>within matched groups</small></div>
+              </div>
+              <div id="evidence" class="evidence" hidden></div>
+            </div>
+            <div class="output-actions">
+              <button class="button button-secondary" id="export-button" type="button" disabled>Export JSON evidence</button>
+              <p id="caution">A match is a lead, not a verdict.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="interpretation" aria-labelledby="interpretation-title">
+        <div>
+          <p class="eyebrow">Evidence dial</p>
+          <h2 id="interpretation-title">What the readout can—and cannot—tell you</h2>
+        </div>
+        <div class="dial-list">
+          <article><span class="dial dial-strong" aria-hidden="true"></span><h3>Strong signal</h3><p>Same normalized message, tight timestamp spread, multiple stream identities, and one or two varying sharding labels.</p></article>
+          <article><span class="dial dial-medium" aria-hidden="true"></span><h3>Needs context</h3><p>Recurring health messages or expected fan-out can look identical. Lens preserves evidence so an operator—not an algorithm—decides.</p></article>
+          <article><span class="dial dial-action" aria-hidden="true"></span><h3>Next check</h3><p>Compare retry intervals, automatic stream-sharding labels, and producer request IDs before changing the pipeline.</p></article>
+        </div>
+      </section>
+
+      <section class="install-section" id="install" aria-labelledby="install-title">
+        <div class="section-heading inverse">
+          <p class="eyebrow">Single binary · no telemetry</p>
+          <h2 id="install-title">Put the lens beside your logs</h2>
+          <p>Build from source today. Release binaries use the same offline engine and stable JSON schema.</p>
+        </div>
+        <div class="terminal-shell">
+          <div class="terminal-top"><span>LOCAL / OPERATOR</span><span>UTF-8</span></div>
+          <pre><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-log-duplicate-lens</code></pre>
+          <button class="copy-button" id="copy-button" type="button">Copy command</button>
+        </div>
+        <div class="cli-notes">
+          <p><strong>Scriptable:</strong> <code>--json</code> emits schema version 1.</p>
+          <p><strong>Bounded:</strong> <code>--max-events</code>, <code>--max-groups</code>, and <code>--max-input-mb</code>.</p>
+          <p><strong>Safe:</strong> <code>--redact</code> scrubs report previews.</p>
+        </div>
+      </section>
+
+      <section class="field-kit" id="field-kit" aria-labelledby="field-kit-title">
+        <div class="field-kit-copy">
+          <p class="eyebrow">Optional operator upgrade</p>
+          <h2 id="field-kit-title">Field Kit</h2>
+          <p class="price"><strong>$29</strong> once · one operator</p>
+          <p>The analyzer and evidence export stay free. Field Kit unlocks saved local investigation presets and a side-by-side sensitivity sweep for 0.5×, 1×, and 2× your selected retry window.</p>
+          <a class="button button-primary" href="https://api.sociobot.in/api/v1/products/log-duplicate-lens/checkout" id="buy-link">Buy Field Kit</a>
+          <p class="merchant-note">Secure checkout by Sociobot/Dodo, the merchant of record. Refunds revoke the license automatically.</p>
+        </div>
+        <div class="license-panel">
+          <div class="bay-label"><span>License socket</span><span id="license-state">Free circuit</span></div>
+          <form id="license-form">
+            <label for="license-token">Have a license? Paste it here</label>
+            <div class="license-row">
+              <input id="license-token" name="license" type="password" autocomplete="off" spellcheck="false" />
+              <button class="button button-secondary" type="submit">Verify license</button>
+            </div>
+            <p class="field-help" id="license-help">Stored only in this browser. Verification sends the token—not your logs—to Sociobot.</p>
+            <p id="license-message" role="status"></p>
+          </form>
+          <div class="pro-controls" id="pro-controls" aria-disabled="true">
+            <label for="preset-name">Preset name</label>
+            <div class="license-row">
+              <input id="preset-name" type="text" maxlength="40" placeholder="On-call retry check" disabled />
+              <button class="button button-quiet" id="save-preset" type="button" disabled>Save preset</button>
+            </div>
+            <button class="button button-quiet full-button" id="sensitivity-button" type="button" disabled>Compare window sensitivity</button>
+            <div id="sensitivity-output" class="sensitivity-output" aria-live="polite"></div>
+          </div>
+          <p class="legal-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="wordmark footer-mark" href="/" aria-label="Log Duplicate Lens home">LDL <span>Log Duplicate Lens</span></a>
+      <p>Made for the moment “same log” stops meaning “same stream.”</p>
+      <nav aria-label="Footer navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-log-duplicate-lens">GitHub</a></nav>
+    </footer>
+  </body>
+</html>
