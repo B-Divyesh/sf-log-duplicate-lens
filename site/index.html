@@ -80,9 +80,9 @@
 
       <section class="calibration-band" aria-label="How Lens works">
         <ol>
-          <li><span>01</span><strong>Read messages</strong><small>Hide changing IDs</small></li>
+          <li><span>01</span><strong>Read messages</strong><small>Ignore changing request IDs when matching messages</small></li>
           <li><span>02</span><strong>Set a retry window</strong><small>Match retry timing</small></li>
-          <li><span>03</span><strong>Compare streams</strong><small>Show differing labels</small></li>
+          <li><span>03</span><strong>Compare streams</strong><small>List labels that differ between streams</small></li>
           <li><span>04</span><strong>Inspect groups</strong><small>Review duplicate evidence</small></li>
         </ol>
       </section>
@@ -99,10 +99,10 @@
             <div class="bay-label"><span>Input A</span><span class="privacy-scope">Local circuit</span></div>
             <label for="log-input">Log sample</label>
             <textarea id="log-input" spellcheck="false" aria-describedby="input-help input-error" placeholder='{"ts": 1700000000000, "msg": "timeout id=12345", "stream": {"shard": "a"}}'></textarea>
-            <p class="field-help" id="input-help">Redact sensitive values before sharing the exported report.</p>
+            <p class="field-help" id="input-help">Remove sensitive values from this input before exporting.</p>
             <p class="field-error" id="input-error" role="alert" hidden></p>
             <div class="input-actions">
-              <button class="button button-secondary" type="button" id="sample-button">Open sample analysis</button>
+              <button class="button button-secondary" type="button" id="sample-button">Show sample result</button>
               <input id="file-input" type="file" accept=".json,.jsonl,.ndjson,.log,.txt,application/json,text/plain" />
               <label class="button button-quiet file-button" for="file-input">Choose file</label>
             </div>
@@ -130,7 +130,7 @@
                   <path class="trace output-trace" d="M158 45h40l8-16 12 34 11-18h49" />
                 </svg>
                 <strong>No sample on the bench</strong>
-                <p>Open the sample analysis or choose a log export.</p>
+                <p>Show the sample result or choose a log export.</p>
               </div>
               <div class="metrics" id="metrics" hidden>
                 <div class="meter meter-primary"><span>Duplicate copies</span><strong id="metric-copies">0</strong><small id="metric-percent">0% of sample</small></div>
@@ -153,7 +153,7 @@
           <h2 id="interpretation-title">What the readout can—and cannot—tell you</h2>
         </div>
         <div class="dial-list">
-          <article><span class="dial dial-strong" aria-hidden="true"></span><h3>Evidence for a duplicate</h3><p>Look for one normalized message across streams within the retry window.</p></article>
+          <article><span class="dial dial-strong" aria-hidden="true"></span><h3>Evidence for a duplicate</h3><p>Look for matching message text across streams within the retry window.</p></article>
           <article><span class="dial dial-medium" aria-hidden="true"></span><h3>Cases that need context</h3><p>Health checks and expected fan-out can look alike. Review the stream labels.</p></article>
           <article><span class="dial dial-action" aria-hidden="true"></span><h3>Check retry and sharding settings</h3><p>Check retry intervals, sharding labels, and producer request IDs before changing a pipeline.</p></article>
         </div>
@@ -176,13 +176,17 @@ log-duplicate-lens demo</code></pre>
           <p><strong>JSON:</strong> use <code>--json</code> for a machine-readable report.</p>
           <p><strong>Limits:</strong> set <code>--max-events</code>, <code>--max-groups</code>, and <code>--max-input-mb</code>.</p>
         </div>
-        <div class="terminal-shell demo-recording" aria-label="Terminal recording of the bundled CLI demo">
-          <div class="terminal-top"><span>CLI DEMO / BUNDLED SAMPLE</span><span>LOCAL</span></div>
-          <pre><code>$ log-duplicate-lens demo
+        <figure class="cli-recording">
+          <img src="/cli-demo.svg" width="960" height="360" loading="lazy" decoding="async" alt="Terminal recording of log-duplicate-lens demo reading seven records and finding two suspected duplicate groups" />
+          <figcaption>Captured from the real CLI demo using the bundled seven-record sample.</figcaption>
+          <details>
+            <summary>Read recording transcript</summary>
+            <pre><code>$ log-duplicate-lens demo
 Bundled sample: 7 labeled log records
 Result: 2 suspected duplicate groups / 3 duplicate copies
 Demo report: /tmp/log-duplicate-lens-demo-….json</code></pre>
-        </div>
+          </details>
+        </figure>
       </section>
     </main>
 

@@ -10,6 +10,7 @@ const shellFiles = [
   "terms/index.html",
   "lens-cutaway-640.webp",
   "lens-cutaway.webp",
+  "cli-demo.svg",
   "favicon.svg",
   "manifest.webmanifest"
 ];

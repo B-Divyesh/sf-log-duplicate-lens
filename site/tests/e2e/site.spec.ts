@@ -2,25 +2,30 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test("@claim:sample-analysis demo immediately shows the bundled duplicate result", async ({ page }) => {
-  await page.goto("/demo");
-  await expect(page).toHaveTitle("Demo — Log Duplicate Lens");
-  await expect(page.getByLabel("Demo controls")).toContainText("sample data, nothing is saved");
-  await expect(page.locator("#readout-state")).toHaveText("Evidence found");
-  await expect(page.locator("#metric-copies")).toHaveText("3");
-  await expect(page.getByRole("heading", { name: "2 suspected duplicate groups" })).toBeVisible();
+  for (const path of ["/demo", "/?demo=1"]) {
+    await page.goto(path);
+    await expect(page).toHaveTitle("Demo — Log Duplicate Lens");
+    await expect(page.getByLabel("Demo controls")).toContainText("sample data, nothing is saved");
+    await expect(page.locator("#readout-state")).toHaveText("Evidence found");
+    await expect(page.locator("#metric-copies")).toHaveText("3");
+    await expect(page.locator("h1")).toHaveText("Review the sample duplicate groups");
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "2 suspected duplicate groups" })).toBeVisible();
+  }
 });
 
 test("@claim:demo-isolation demo stores no normal application data and reset keeps its result", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("real:operator-setting", "keep"));
   await page.goto("/demo");
   await expect(page.locator("#metric-copies")).toHaveText("3");
-  const keys = await page.evaluate(() => Object.keys(localStorage));
-  expect(keys).toEqual(["demo:log-duplicate-lens:active"]);
+  const keys = await page.evaluate(() => Object.keys(localStorage).sort());
+  expect(keys).toEqual(["demo:log-duplicate-lens:active", "real:operator-setting"]);
   await page.getByRole("button", { name: "Reset demo" }).click();
   await expect(page.locator("#metric-copies")).toHaveText("3");
-  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(["demo:log-duplicate-lens:active"]);
+  expect(await page.evaluate(() => Object.keys(localStorage).sort())).toEqual(["demo:log-duplicate-lens:active", "real:operator-setting"]);
   await page.getByRole("button", { name: "Start for real" }).click();
   await expect(page).toHaveURL(/\/$/);
-  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
+  expect(await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)))).toEqual({ "real:operator-setting": "keep" });
 });
 
 test("@claim:demo-mobile-result a sample click keeps the sandbox notice and result in a 390px viewport", async ({ page }) => {
@@ -32,12 +37,23 @@ test("@claim:demo-mobile-result a sample click keeps the sandbox notice and resu
   const result = page.getByRole("heading", { name: "2 suspected duplicate groups" });
   await expect(banner).toBeVisible();
   await expect(result).toBeVisible();
+  await expect(result).toBeFocused();
   for (const locator of [banner, result]) {
-    const box = await locator.boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.y).toBeGreaterThanOrEqual(0);
-    expect(box!.y + box!.height).toBeLessThanOrEqual(844);
+    await expect.poll(async () => {
+      const box = await locator.boundingBox();
+      return Boolean(box && box.y >= 0 && box.y + box.height <= 844);
+    }).toBe(true);
   }
+});
+
+test("@claim:browser-sample-action Show sample result analyzes the sample immediately", async ({ page }) => {
+  await page.goto("/");
+  const action = page.getByRole("button", { name: "Show sample result" });
+  await expect(action).toBeVisible();
+  await action.click();
+  await expect(page.locator("#readout-state")).toHaveText("Evidence found");
+  await expect(page.locator("#metric-copies")).toHaveText("3");
+  await expect(page.getByRole("heading", { name: "2 suspected duplicate groups" })).toBeVisible();
 });
 
 test("@claim:demo-private demo sends no off-origin requests", async ({ page }) => {
@@ -118,6 +134,44 @@ test("@claim:browser-input-formats browser accepts JSON lines, a Loki response, 
   }
 });
 
+test("@claim:browser-normalization browser ignores changing request IDs when matching messages", async ({ page }) => {
+  const jsonl = [
+    { ts: 1_700_000_000_000, msg: "checkout timed out request=12345", stream: { app: "checkout", shard: "a" } },
+    { ts: 1_700_000_000_200, msg: "checkout timed out request=67890", stream: { app: "checkout", shard: "b" } }
+  ].map((event) => JSON.stringify(event)).join("\n");
+  await page.goto("/");
+  await page.locator("#log-input").fill(jsonl);
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.getByRole("heading", { name: "1 suspected duplicate group" })).toBeVisible();
+  await expect(page.locator("#metric-copies")).toHaveText("1");
+});
+
+test("@claim:browser-label-evidence browser lists labels that differ between matched streams", async ({ page }) => {
+  const jsonl = [
+    { ts: 1_700_000_000_000, msg: "checkout timed out request=12345", stream: { app: "checkout", shard: "original" } },
+    { ts: 1_700_000_000_200, msg: "checkout timed out request=67890", stream: { app: "checkout", shard: "auto-3" } }
+  ].map((event) => JSON.stringify(event)).join("\n");
+  await page.goto("/");
+  await page.locator("#log-input").fill(jsonl);
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.locator("#evidence")).toContainText("varying shard");
+});
+
+test("@claim:cli-demo-recording local recording and text fallback show the real CLI demo result", async ({ page }) => {
+  await page.goto("/");
+  const recording = page.getByRole("img", { name: /Terminal recording of log-duplicate-lens demo/ });
+  await expect(recording).toHaveAttribute("src", "/cli-demo.svg");
+  await expect(page.getByText("Captured from the real CLI demo using the bundled seven-record sample.")).toBeVisible();
+  await page.getByText("Read recording transcript").click();
+  await expect(page.locator(".cli-recording details")).toContainText("log-duplicate-lens demo");
+  await expect(page.locator(".cli-recording details")).toContainText("2 suspected duplicate groups / 3 duplicate copies");
+  const asset = await page.request.get("/cli-demo.svg");
+  expect(asset.status()).toBe(200);
+  const svg = await asset.text();
+  expect(svg).toContain("cargo run --quiet -p log-duplicate-lens -- demo");
+  expect(svg).toContain("Result: 2 suspected duplicate groups / 3 duplicate copies");
+});
+
 test("@claim:site-privacy site loads without third-party requests or persistent browser storage", async ({ page }) => {
   const offOrigin: string[] = [];
   page.on("request", (request) => {
@@ -136,12 +190,15 @@ test("explains malformed input and restores focus", async ({ page }) => {
   await expect(page.locator("#log-input")).toBeFocused();
 });
 
-test("has no serious accessibility violations and one h1", async ({ page }) => {
-  await page.goto("/");
-  const results = await new AxeBuilder({ page: page as never }).analyze();
-  expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
-  await expect(page.locator("h1")).toHaveCount(1);
-  await expect(page.locator("main")).toHaveCount(1);
+test("all routes have one h1, one main, and no serious accessibility violations", async ({ page }) => {
+  for (const path of ["/", "/demo", "/privacy/", "/terms/", "/404/"]) {
+    await page.goto(path);
+    await expect(page.locator("h1")).toHaveCount(1);
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("main")).toHaveCount(1);
+    const results = await new AxeBuilder({ page: page as never }).analyze();
+    expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? "")), path).toEqual([]);
+  }
 });
 
 test("demo evidence pane remains keyboard-accessible", async ({ page }) => {
@@ -179,12 +236,27 @@ test("ships local touch and social assets with their declared dimensions", async
 });
 
 test("routes expose separate titles and a designed not-found page", async ({ page }) => {
+  const demoResponse = await page.request.get("/demo/index.html");
+  const demoSource = await demoResponse.text();
+  expect(demoSource).toContain("<title>Demo — Log Duplicate Lens</title>");
+  expect(demoSource).toContain('content="Try a local sample that shows duplicate Loki logs across streams."');
+  await page.goto("/");
+  await page.getByRole("link", { name: "Demo" }).first().click();
+  await expect(page).toHaveURL(/\/demo$/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://log-duplicate-lens.sociobot.in/demo");
+  await expect(page.locator("#route-announcer")).toHaveText("Demo — Log Duplicate Lens");
+  await expect(page.getByRole("heading", { name: "2 suspected duplicate groups" })).toBeFocused();
+  await page.goBack();
+  await expect(page).toHaveTitle("Log Duplicate Lens — find duplicate Loki logs");
   await page.goto("/privacy/");
   await expect(page).toHaveTitle("Privacy — Log Duplicate Lens");
+  await expect(page.getByRole("link", { name: "Terms" }).first()).toHaveAttribute("href", "/terms/");
   await page.goto("/terms/");
   await expect(page).toHaveTitle("Terms — Log Duplicate Lens");
+  await expect(page.getByRole("link", { name: "Privacy" }).first()).toHaveAttribute("href", "/privacy/");
   await page.goto("/404/");
   await expect(page).toHaveTitle("Page not found — Log Duplicate Lens");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://log-duplicate-lens.sociobot.in/404/");
   await expect(page.getByRole("heading", { name: "This instrument page is not here" })).toBeVisible();
 });
 
@@ -205,4 +277,37 @@ test("service worker uses a fresh online shell and retains an offline fallback",
   await context.setOffline(true);
   await page.reload();
   await expect(page.getByRole("heading", { name: /Find duplicate Loki logs/ })).toBeVisible();
+});
+
+test("mobile controls meet touch targets and reduced motion removes animation", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/demo");
+  await expect(page.locator("#metric-copies")).toHaveText("3");
+  for (const control of [
+    page.getByRole("button", { name: "Reset demo" }),
+    page.getByRole("button", { name: "Start for real" }),
+    page.getByRole("button", { name: "Export JSON evidence" })
+  ]) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+  const reducedDuration = await page.locator(".trace").first().evaluate((element) => Number.parseFloat(getComputedStyle(element).animationDuration));
+  expect(reducedDuration).toBeLessThanOrEqual(0.00001);
+});
+
+test("keyboard operates sample and demo controls without a trap", async ({ page }) => {
+  await page.goto("/");
+  const action = page.getByRole("button", { name: "Show sample result" });
+  await action.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#metric-copies")).toHaveText("3");
+  await page.goto("/demo");
+  const reset = page.getByRole("button", { name: "Reset demo" });
+  await reset.focus();
+  await page.keyboard.press("Space");
+  await expect(page.getByRole("heading", { name: "2 suspected duplicate groups" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Export JSON evidence" })).toBeFocused();
 });

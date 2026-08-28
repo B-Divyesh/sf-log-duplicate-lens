@@ -30,7 +30,7 @@ function loadSample(analyze = false): void {
   else input.focus();
 }
 
-byId("sample-button").addEventListener("click", () => loadSample(false));
+byId("sample-button").addEventListener("click", () => loadSample(true));
 byId("demo-reset").addEventListener("click", () => loadSample(true));
 byId("demo-exit").addEventListener("click", () => {
   for (const key of Object.keys(localStorage)) if (key.startsWith("demo:")) localStorage.removeItem(key);
@@ -67,11 +67,7 @@ function runAnalysis(): void {
       setReadoutState(currentReport.suspectedGroups ? "Evidence found" : "No cross-stream matches", false);
       exportButton.disabled = false;
       if (isDemo) {
-        window.setTimeout(() => {
-          const heading = document.getElementById("result-heading");
-          heading?.scrollIntoView({ block: "start" });
-          heading?.focus({ preventScroll: true });
-        }, 0);
+        positionDemoResult();
       }
     } catch (error) {
       currentEvents = [];
@@ -137,6 +133,39 @@ function showError(message: string): void { errorBox.textContent = message; erro
 function clearError(): void { errorBox.textContent = ""; errorBox.hidden = true; }
 function formatBytes(bytes: number): string { return bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KB`; }
 
+function setDemoHeadingOutline(): void {
+  const homeHeading = byId("hero-title");
+  const demoHeading = byId("workbench-title");
+  const hiddenHomeHeading = document.createElement("h2");
+  hiddenHomeHeading.id = homeHeading.id;
+  hiddenHomeHeading.tabIndex = -1;
+  hiddenHomeHeading.textContent = homeHeading.textContent;
+  homeHeading.replaceWith(hiddenHomeHeading);
+
+  const routeHeading = document.createElement("h1");
+  routeHeading.id = demoHeading.id;
+  routeHeading.tabIndex = -1;
+  routeHeading.textContent = "Review the sample duplicate groups";
+  demoHeading.replaceWith(routeHeading);
+}
+
+function positionDemoResult(): void {
+  const heading = document.getElementById("result-heading");
+  const banner = byId("demo-banner");
+  if (!heading) return;
+
+  // Route entry must settle before a claim or a keyboard user inspects it.
+  // Override the decorative page scroll for this state transition only.
+  const root = document.documentElement;
+  const previousBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  const bannerOffset = banner.getBoundingClientRect().height + 20;
+  const top = heading.getBoundingClientRect().top + window.scrollY - bannerOffset;
+  window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+  heading.focus({ preventScroll: true });
+  requestAnimationFrame(() => { root.style.scrollBehavior = previousBehavior; });
+}
+
 function updateNetwork(): void {
   const label = byId("network-label"); const strip = byId("network-strip");
   label.textContent = navigator.onLine ? "Local circuit ready · nothing uploaded" : "Offline · analysis and export still work locally";
@@ -146,10 +175,13 @@ window.addEventListener("online", updateNetwork); window.addEventListener("offli
 
 if (isDemo) {
   document.body.classList.add("demo-mode");
+  setDemoHeadingOutline();
   localStorage.setItem(DEMO_KEY, "active");
   byId("demo-banner").hidden = false;
   document.title = "Demo — Log Duplicate Lens";
   document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute("href", "https://log-duplicate-lens.sociobot.in/demo");
+  document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.setAttribute("content", "Demo — Log Duplicate Lens");
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.setAttribute("content", "Demo — Log Duplicate Lens");
   byId("route-announcer").textContent = "Demo — Log Duplicate Lens";
   loadSample(true);
 }

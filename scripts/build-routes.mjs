@@ -1,9 +1,20 @@
-import { cp, mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const out = "dist/site";
 await mkdir(join(out, "demo"), { recursive: true });
-await cp(join(out, "index.html"), join(out, "demo", "index.html"));
+const rootHtml = await readFile(join(out, "index.html"), "utf8");
+const demoHtml = rootHtml
+  .replaceAll("Log Duplicate Lens — find duplicate Loki logs", "Demo — Log Duplicate Lens")
+  .replaceAll(
+    "Find duplicate Loki logs across streams before they inflate alerts and storage.",
+    "Try a local sample that shows duplicate Loki logs across streams."
+  )
+  .replace(
+    '<link rel="canonical" href="https://log-duplicate-lens.sociobot.in/"',
+    '<link rel="canonical" href="https://log-duplicate-lens.sociobot.in/demo"'
+  );
+await writeFile(join(out, "demo", "index.html"), demoHtml);
 
 const assets = await readdir(join(out, "assets"));
 const stylesheet = assets.find((name) => name.startsWith("styles-") && name.endsWith(".css"));
@@ -17,7 +28,7 @@ const html = `<!doctype html>
 <meta property="og:description" content="The requested Log Duplicate Lens page was not found.">
 <meta property="og:image" content="https://log-duplicate-lens.sociobot.in/social-card.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Page not found — Log Duplicate Lens"><meta name="twitter:description" content="The requested Log Duplicate Lens page was not found."><meta name="twitter:image" content="https://log-duplicate-lens.sociobot.in/social-card.png">
-<title>Page not found — Log Duplicate Lens</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"><link rel="stylesheet" href="/assets/${stylesheet}">
+<link rel="canonical" href="https://log-duplicate-lens.sociobot.in/404/"><title>Page not found — Log Duplicate Lens</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"><link rel="stylesheet" href="/assets/${stylesheet}">
 </head><body>
 <a class="skip-link" href="#main">Skip to main content</a><div class="network-strip"><span class="status-lamp" aria-hidden="true"></span><span>Instrument route check</span></div>
 <header class="site-header"><a class="wordmark" href="/" aria-label="Log Duplicate Lens home">LDL <span>Log Duplicate Lens<small>Local diagnostic · 0.1.0</small></span></a><nav aria-label="Primary navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav></header>

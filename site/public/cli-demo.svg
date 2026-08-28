@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title description">
+  <title id="title">Log Duplicate Lens CLI demo recording</title>
+  <desc id="description">The real demo command reads seven bundled log records, finds two suspected duplicate groups and three duplicate copies, then writes a temporary JSON report.</desc>
+  <metadata>Captured 2026-08-28 from: cargo run --quiet -p log-duplicate-lens -- demo; sample SHA-256: 644e6d5aaa653e4b9a7dfc383fa4d74bee4d539d287c4dcddc29dce926e47233</metadata>
+  <style>
+    .label { fill: #c6d0c8; font: 700 13px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: 1.8px; }
+    .text { fill: #b8e4d7; font: 18px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .prompt { fill: #f2a43b; font-weight: 700; }
+    .muted { fill: #89968f; }
+    .line { opacity: 0; animation: reveal 180ms ease-out forwards; }
+    .line-1 { animation-delay: 300ms; }
+    .line-2 { animation-delay: 900ms; }
+    .line-3 { animation-delay: 1400ms; }
+    .line-4 { animation-delay: 1900ms; }
+    .pulse { opacity: 0; animation: pulse-in 260ms ease-out 1320ms forwards; transform-origin: center; }
+    @keyframes reveal { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse-in { from { opacity: 0; transform: scaleX(.15); } to { opacity: 1; transform: scaleX(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .line, .pulse { opacity: 1; animation: none; transform: none; }
+    }
+  </style>
+  <rect width="960" height="360" rx="7" fill="#151d1a"/>
+  <rect x="1" y="1" width="958" height="358" rx="6" fill="none" stroke="#637069" stroke-width="2"/>
+  <path d="M0 48h960" stroke="#53605a"/>
+  <circle cx="24" cy="24" r="5" fill="#f2a43b"/>
+  <circle cx="44" cy="24" r="5" fill="#63b7a0"/>
+  <text x="68" y="29" class="label">CLI DEMO / REAL BUNDLED SAMPLE</text>
+  <text x="885" y="29" class="label">LOCAL</text>
+  <g aria-hidden="true" opacity=".12" stroke="#63b7a0">
+    <path d="M26 310h908M26 326h908"/>
+    <path d="M40 300v36M80 306v24M120 300v36M160 306v24M200 300v36M240 306v24M280 300v36M320 306v24M360 300v36M400 306v24M440 300v36M480 306v24M520 300v36M560 306v24M600 300v36M640 306v24M680 300v36M720 306v24M760 300v36M800 306v24M840 300v36M880 306v24M920 300v36"/>
+  </g>
+  <g class="text">
+    <text x="36" y="92" class="line line-1"><tspan class="prompt">$</tspan><tspan dx="12">log-duplicate-lens demo</tspan></text>
+    <text x="36" y="139" class="line line-2">Bundled sample: 7 labeled log records</text>
+    <g class="line line-3">
+      <text x="36" y="186">Result: 2 suspected duplicate groups / 3 duplicate copies</text>
+      <rect class="pulse" x="36" y="205" width="676" height="4" rx="2" fill="#f2a43b"/>
+    </g>
+    <text x="36" y="252" class="line line-4">Demo report: /tmp/log-duplicate-lens-demo-….json</text>
+    <text x="36" y="332" class="muted">one command · bundled input · temporary output</text>
+  </g>
+</svg>

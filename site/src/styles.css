@@ -45,6 +45,10 @@ html {
   scroll-padding-top: 88px;
 }
 
+html:has(.demo-mode) {
+  scroll-behavior: auto;
+}
+
 body {
   min-width: 320px;
   margin: 0;
@@ -142,6 +146,7 @@ button,
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  min-height: 44px;
   color: var(--ink);
   font-family: var(--display);
   font-size: 19px;
@@ -222,7 +227,7 @@ footer nav {
 }
 
 .demo-actions button {
-  min-height: 36px;
+  min-height: 44px;
   padding: 6px 10px;
   border: 1px solid var(--ink);
   background: var(--paper);
@@ -1015,7 +1020,7 @@ textarea::placeholder,
   position: absolute;
   right: 18px;
   bottom: 24px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid #718078;
   border-radius: 3px;
@@ -1046,6 +1051,54 @@ textarea::placeholder,
 .cli-notes code {
   background: #111815;
   color: #b8e4d7;
+}
+
+.cli-recording {
+  width: min(900px, 100%);
+  margin: 42px auto 0;
+}
+
+.cli-recording img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #637069;
+  border-radius: 5px;
+  background: var(--panel-deep);
+  box-shadow: inset 0 0 24px rgb(0 0 0 / 0.34), 0 18px 42px rgb(0 0 0 / 0.2);
+}
+
+.cli-recording figcaption {
+  margin-top: 12px;
+  color: var(--chalk-soft);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.cli-recording details {
+  margin-top: 14px;
+  color: var(--chalk-soft);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.cli-recording summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.cli-recording pre {
+  margin: 8px 0 0;
+  padding: 18px;
+  overflow-x: auto;
+  border-left: 3px solid var(--signal);
+  background: #111815;
+  color: #b8e4d7;
+  white-space: pre-wrap;
 }
 
 .field-kit {
@@ -1284,7 +1337,7 @@ footer nav a {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     width: 100%;
-    gap: 4px;
+    gap: 8px;
   }
 
   .site-header nav a {
@@ -1334,7 +1387,7 @@ footer nav a {
     margin-bottom: 20px;
   }
 
-  .demo-mode .section-heading h2 {
+  .demo-mode .section-heading #workbench-title {
     font-size: 2rem;
   }
 

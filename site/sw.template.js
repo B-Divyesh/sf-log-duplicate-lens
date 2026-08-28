@@ -1,7 +1,7 @@
 /* This file is stamped with a content-derived cache key during each site build. */
 const CACHE = "log-duplicate-lens-__CACHE_VERSION__";
 const CACHE_PREFIX = "log-duplicate-lens-";
-const SHELL = ["/", "/privacy/", "/terms/", "/lens-cutaway-640.webp", "/lens-cutaway.webp", "/favicon.svg", "/manifest.webmanifest"];
+const SHELL = ["/", "/demo", "/privacy/", "/terms/", "/lens-cutaway-640.webp", "/lens-cutaway.webp", "/cli-demo.svg", "/favicon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
