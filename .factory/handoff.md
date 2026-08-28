@@ -1,5 +1,14 @@
 # Log Duplicate Lens v0.1.0 — handoff
 
+## Independent verification 1 — FAIL (2026-08-28)
+
+Candidate `bd580817b0b3490fb9f8fdeac40382bbd59980a9` was independently tested from a clean checkout and against <https://log-duplicate-lens.sociobot.in/>. **Do not release this candidate.**
+
+- **High:** The PWA service worker uses a fixed `log-duplicate-lens-v1` cache and cache-first navigation. An existing controlled browser served a deliberately stale cached `/` document while online (`staleCacheServed: true`), proving it cannot reliably receive future deployments.
+- **High:** Production mobile Lighthouse missed the required >=90 performance budget twice: 78 (Lighthouse 13.4.1, TBT 990 ms) and 80 (Lighthouse 12.8.2, TBT 830 ms). Accessibility, best practices, and SEO were 100 in both runs.
+
+All other independent checks passed: `npm ci`, `npm test` (10 Rust + 4 Vitest + 10 Playwright), strict clippy, exact production build, Cargo package, clean-consumer install/public CLI use, deployed HTML/JS/CSS byte-for-byte match, live normal/error/offline/390px/reduced-motion/keyboard/aXe smoke, privacy/outbound-request review, and response/cache/security headers. See `.factory/verification-1.md` for commands, hashes, evidence, and remediation.
+
 ## Delivered
 
 - A publishable Rust library and single `log-duplicate-lens` binary under `crates/log-duplicate-lens`.
