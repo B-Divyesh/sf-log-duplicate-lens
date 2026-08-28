@@ -1,1 +1,1 @@
-Find duplicate Loki logs across streams to investigate alert and storage inflation.
+Find duplicate Loki logs across streams before they inflate alert counts and storage.

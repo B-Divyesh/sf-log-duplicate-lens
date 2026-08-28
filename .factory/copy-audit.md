@@ -1,4 +1,4 @@
-# Copy audit — polish 4
+# Copy audit — polish 5
 
 Checked 2026-08-28. Counts treat hyphenated terms, options, and version strings
 as one word. No visitor-facing sentence exceeds 22 words. No text uses the
@@ -22,7 +22,7 @@ product capability.
 | Evidence, not verdicts | 3 | limitation |
 | Three stream traces through one suspected duplicate group | 8 | illustration caption |
 | Read messages / Ignore changing request IDs when matching messages | 2 / 7 | `browser-normalization` |
-| Set a retry window / Match retry timing | 4 / 3 | control explanation |
+| Set a retry window / Match retry timing | 4 / 3 | `browser-retry-window` |
 | Compare streams / List labels that differ between streams | 2 / 6 | `browser-label-evidence` |
 | Inspect groups / Review duplicate evidence | 2 / 3 | workflow |
 | Bench test · browser edition / Check a log sample | 4 / 4 | context |
@@ -32,14 +32,14 @@ product capability.
 | Remove sensitive values from this input before exporting. | 8 | user guidance; no browser-redaction promise |
 | Show sample result | 3 | `browser-sample-action` |
 | Choose file / Retry window | 2 / 2 | controls |
-| 0.5 s / 2 s / 5 s | 2 / 2 / 2 | controls |
+| 0.5 s / 2 s / 5 s | 2 / 2 / 2 | `browser-retry-window` controls |
 | Analyze this sample | 3 | action |
 | Readout B / Awaiting sample | 2 / 2 | status |
 | No sample on the bench | 5 | empty state |
 | Show the sample result or choose a log export. | 9 | empty-state action |
 | Duplicate copies / 0% of sample | 2 / 3 | result labels |
-| Alert amplifier / if each copy fires | 2 / 4 | estimate label |
-| Extra bytes / in suspected duplicate groups | 2 / 4 | estimate label |
+| Estimated alerts if every duplicate fires / based on observed events | 6 / 4 | `browser-impact-estimates` |
+| Extra log bytes / in suspected duplicate groups | 3 / 4 | `browser-impact-estimates` |
 | Export JSON evidence | 3 | `json-export` |
 | A match is a lead, not a verdict. | 8 | limitation |
 | How to assess a suspected duplicate | 6 | section label |

@@ -157,6 +157,39 @@ test("@claim:browser-label-evidence browser lists labels that differ between mat
   await expect(page.locator("#evidence")).toContainText("varying shard");
 });
 
+test("@claim:browser-retry-window browser retry window changes which cross-stream events match", async ({ page }) => {
+  const jsonl = [
+    { ts: 1_700_000_000_000, msg: "retry window check id=12345", stream: { shard: "a" } },
+    { ts: 1_700_000_001_600, msg: "retry window check id=67890", stream: { shard: "b" } }
+  ].map((event) => JSON.stringify(event)).join("\n");
+  await page.goto("/");
+  await page.locator("#log-input").fill(jsonl);
+  await page.getByRole("radio", { name: "0.5 s" }).check();
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.locator("#readout-state")).toHaveText("No cross-stream matches");
+  await expect(page.locator("#metric-copies")).toHaveText("0");
+  await page.getByRole("radio", { name: "2 s" }).check();
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.locator("#readout-state")).toHaveText("Evidence found");
+  await expect(page.getByRole("heading", { name: "1 suspected duplicate group" })).toBeVisible();
+  await expect(page.locator("#metric-copies")).toHaveText("1");
+});
+
+test("@claim:browser-impact-estimates browser shows observed copy, alert, and byte estimates", async ({ page }) => {
+  const jsonl = [
+    { ts: 1_700_000_000_000, msg: "x", stream: { shard: "a" } },
+    { ts: 1_700_000_000_100, msg: "x", stream: { shard: "b" } }
+  ].map((event) => JSON.stringify(event)).join("\n");
+  await page.goto("/");
+  await page.locator("#log-input").fill(jsonl);
+  await page.getByRole("button", { name: "Analyze this sample" }).click();
+  await expect(page.locator("#metric-copies")).toHaveText("1");
+  await expect(page.getByText("Estimated alerts if every duplicate fires")).toBeVisible();
+  await expect(page.locator("#metric-alert")).toHaveText("2.00×");
+  await expect(page.getByText("Extra log bytes")).toBeVisible();
+  await expect(page.locator("#metric-bytes")).toHaveText("1 B");
+});
+
 test("@claim:cli-demo-recording local recording and text fallback show the real CLI demo result", async ({ page }) => {
   await page.goto("/");
   const recording = page.getByRole("img", { name: /Terminal recording of log-duplicate-lens demo/ });
@@ -252,14 +285,25 @@ test("routes expose separate titles and a designed not-found page", async ({ pag
   await expect(page.getByRole("heading", { name: "Find duplicate Loki logs across streams" })).toBeFocused();
   await page.goto("/privacy/");
   await expect(page).toHaveTitle("Privacy — Log Duplicate Lens");
+  await expect(page.locator("#route-announcer")).toHaveText("Privacy — Log Duplicate Lens");
+  await expect(page.getByRole("heading", { name: "Privacy" })).toBeFocused();
   await expect(page.getByRole("link", { name: "Terms" }).first()).toHaveAttribute("href", "/terms/");
-  await page.goto("/terms/");
+  await page.getByRole("link", { name: "Terms" }).first().click();
   await expect(page).toHaveTitle("Terms — Log Duplicate Lens");
+  await expect(page.locator("#route-announcer")).toHaveText("Terms — Log Duplicate Lens");
+  await expect(page.getByRole("heading", { name: "Terms" })).toBeFocused();
   await expect(page.getByRole("link", { name: "Privacy" }).first()).toHaveAttribute("href", "/privacy/");
   await page.goto("/404/");
   await expect(page).toHaveTitle("Page not found — Log Duplicate Lens");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://log-duplicate-lens.sociobot.in/404/");
-  await expect(page.getByRole("heading", { name: "This instrument page is not here" })).toBeVisible();
+  await expect(page.locator("#route-announcer")).toHaveText("Page not found — Log Duplicate Lens");
+  await expect(page.getByRole("heading", { name: "This instrument page is not here" })).toBeFocused();
+  await expect(page.locator("footer")).toContainText("Built by Param Factory · v0.1.0");
+  await expect(page.locator("footer").getByRole("link", { name: "View source code" })).toHaveAttribute("href", "https://github.com/B-Divyesh/sf-log-duplicate-lens");
+  await page.goBack();
+  await expect(page).toHaveTitle("Terms — Log Duplicate Lens");
+  await expect(page.locator("#route-announcer")).toHaveText("Terms — Log Duplicate Lens");
+  await expect(page.getByRole("heading", { name: "Terms" })).toBeFocused();
 });
 
 test("service worker uses a fresh online shell and retains an offline fallback", async ({ page, context }) => {

@@ -19,6 +19,8 @@ await writeFile(join(out, "demo", "index.html"), demoHtml);
 const assets = await readdir(join(out, "assets"));
 const stylesheet = assets.find((name) => name.startsWith("styles-") && name.endsWith(".css"));
 if (!stylesheet) throw new Error("Could not find built stylesheet for the 404 route");
+const legalRoute = assets.find((name) => /^legal-?route-/i.test(name) && name.endsWith(".js"));
+if (!legalRoute) throw new Error("Could not find built legal-route script for the 404 route");
 
 const html = `<!doctype html>
 <html lang="en"><head>
@@ -30,10 +32,10 @@ const html = `<!doctype html>
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Page not found — Log Duplicate Lens"><meta name="twitter:description" content="The requested Log Duplicate Lens page was not found."><meta name="twitter:image" content="https://log-duplicate-lens.sociobot.in/social-card.png">
 <link rel="canonical" href="https://log-duplicate-lens.sociobot.in/404/"><title>Page not found — Log Duplicate Lens</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"><link rel="stylesheet" href="/assets/${stylesheet}">
 </head><body>
-<a class="skip-link" href="#main">Skip to main content</a><div class="network-strip"><span class="status-lamp" aria-hidden="true"></span><span>Instrument route check</span></div>
+<a class="skip-link" href="#main">Skip to main content</a><p class="sr-only" id="route-announcer" aria-live="polite"></p><div class="network-strip"><span class="status-lamp" aria-hidden="true"></span><span>Instrument route check</span></div>
 <header class="site-header"><a class="wordmark" href="/" aria-label="Log Duplicate Lens home">LDL <span>Log Duplicate Lens<small>Local diagnostic · 0.1.0</small></span></a><nav aria-label="Primary navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav></header>
-<main class="legal-main" id="main"><p class="eyebrow">Route not found</p><h1>This instrument page is not here</h1><p>Check the address, return home, or open the sample analysis.</p><p class="hero-actions"><a class="button button-primary" href="/">Go home</a><a class="button button-secondary" href="/demo">Open sample analysis</a></p></main>
-<footer><a class="wordmark footer-mark" href="/">LDL <span>Log Duplicate Lens</span></a><p>Find suspected duplicate groups across Loki streams.</p><nav aria-label="Footer navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav></footer>
+<main class="legal-main" id="main"><p class="eyebrow">Route not found</p><h1 tabindex="-1">This instrument page is not here</h1><p>Check the address, return home, or open the sample analysis.</p><p class="hero-actions"><a class="button button-primary" href="/">Go home</a><a class="button button-secondary" href="/demo">Open sample analysis</a></p></main>
+<footer><a class="wordmark footer-mark" href="/">LDL <span>Log Duplicate Lens</span></a><p>Find suspected duplicate groups across Loki streams. Built by Param Factory · v0.1.0</p><nav aria-label="Footer navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-log-duplicate-lens">View source code</a></nav></footer><script type="module" src="/assets/${legalRoute}"></script>
 </body></html>`;
 await mkdir(join(out, "404"), { recursive: true });
 await writeFile(join(out, "404", "index.html"), html);

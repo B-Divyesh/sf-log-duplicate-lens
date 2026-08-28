@@ -13,7 +13,8 @@ export default defineConfig({
       input: {
         index: fileURLToPath(new URL("./site/index.html", import.meta.url)),
         privacy: fileURLToPath(new URL("./site/privacy/index.html", import.meta.url)),
-        terms: fileURLToPath(new URL("./site/terms/index.html", import.meta.url))
+        terms: fileURLToPath(new URL("./site/terms/index.html", import.meta.url)),
+        legalRoute: fileURLToPath(new URL("./site/src/legal-route.ts", import.meta.url))
       }
     }
   }

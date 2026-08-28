@@ -22,6 +22,7 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
+    <p class="sr-only" id="route-announcer" aria-live="polite"></p>
     <div class="network-strip"><span class="status-lamp" aria-hidden="true"></span><span>Operator terms · evidence remains yours</span></div>
     <header class="site-header">
       <a class="wordmark" href="/" aria-label="Log Duplicate Lens home">LDL <span>Log Duplicate Lens<small>Local diagnostic · 0.1.0</small></span></a>
@@ -29,7 +30,7 @@
     </header>
     <main class="legal-main" id="main">
       <p class="eyebrow">Operator agreement</p>
-      <h1>Terms</h1>
+      <h1 tabindex="-1">Terms</h1>
       <p class="effective">Effective August 28, 2026</p>
       <p>These terms govern the hosted documentation, browser workbench, and open-source CLI. The CLI is available under the MIT License.</p>
 
@@ -46,5 +47,6 @@
       <p>Questions about these terms may be sent to <a href="mailto:support@sociobot.in">support@sociobot.in</a>.</p>
     </main>
     <footer><a class="wordmark footer-mark" href="/">LDL <span>Log Duplicate Lens</span></a><p>Find suspected duplicate groups across Loki streams. Built by Param Factory · v0.1.0</p><nav aria-label="Footer navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav></footer>
+    <script type="module" src="/src/legal-route.ts"></script>
   </body>
 </html>
