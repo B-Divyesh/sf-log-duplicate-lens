@@ -784,23 +784,22 @@ textarea::placeholder,
 .trace {
   fill: none;
   stroke: var(--ink-soft);
-  stroke-dasharray: 340;
-  stroke-dashoffset: 340;
+  opacity: 0;
   stroke-width: 2;
-  animation: draw-trace 900ms ease-out forwards;
+  animation: reveal-trace 240ms ease-out forwards;
 }
 
 .trace-b {
-  animation-delay: 100ms;
+  animation-delay: 60ms;
 }
 
 .trace-c {
-  animation-delay: 200ms;
+  animation-delay: 120ms;
 }
 
 .output-trace {
   stroke: var(--signal-dark);
-  animation-delay: 420ms;
+  animation-delay: 180ms;
 }
 
 .empty-readout strong,
@@ -1254,8 +1253,8 @@ footer nav a {
   text-transform: uppercase;
 }
 
-@keyframes draw-trace {
-  to { stroke-dashoffset: 0; }
+@keyframes reveal-trace {
+  to { opacity: 1; }
 }
 
 @media (max-width: 940px) {
@@ -1522,6 +1521,6 @@ footer nav a {
   }
 
   .trace {
-    stroke-dashoffset: 0;
+    opacity: 1;
   }
 }

@@ -186,5 +186,9 @@ if (isDemo) {
   loadSample(true);
 }
 
-if ("serviceWorker" in navigator && import.meta.env.PROD) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => undefined));
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    window.setTimeout(() => navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => undefined), 3_000);
+  }, { once: true });
+}
 function byId<T extends HTMLElement = HTMLElement>(id: string): T { const element = document.getElementById(id); if (!element) throw new Error(`Missing #${id}`); return element as T; }
