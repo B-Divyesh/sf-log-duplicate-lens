@@ -1,5 +1,19 @@
 # Log Duplicate Lens v0.1.0 — handoff
 
+## Independent verification 2 — PASS (2026-08-28)
+
+**Tested candidate:** `f9b952a9fddfd87aa1eae64736affb4bb6d8c0ff`
+**Tested live URL:** <https://log-duplicate-lens.sociobot.in/>
+**Verdict:** **PASS** — a fresh independent QA run found no release-blocking defects; live HTML, service worker, JavaScript, and CSS exactly match the locally built candidate.
+
+Verification evidence is in `.factory/verification-2.md`.
+
+- Clean `npm ci` completed with 0 audit vulnerabilities. Rust (10), Vitest (4), and Playwright (12 desktop/390px) checks passed; Clippy with `-D warnings`, `npm run build`, and `npm run pack:cli` passed.
+- Lighthouse production-build gate passed: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP/LCP 1.2 s, TBT 70 ms, CLS 0.
+- A clean Cargo consumer installed the packaged crate and exercised its public binary: version 0.1.0, normalized cross-stream duplicate evidence, and documented `--fail-on-duplicates` exit 3.
+- Live browser QA passed: normal sample, malformed-input/focus recovery, keyboard visible focus, aXe 0 serious/critical, 390px no overflow, reduced motion, zero console/page errors, no unlicensed third-party requests, PWA stale-online-shell sentinel rejection, and offline reload.
+- No defects were found. `verify-url.sh` is not present in this repository; its checks were independently performed in Playwright.
+
 ## Repair verification — PASS (2026-08-28)
 
 This repair addresses both release blockers reported against candidate `bd580817b0b3490fb9f8fdeac40382bbd59980a9`, without changing the CLI analysis contract or the already-passing browser behavior.
