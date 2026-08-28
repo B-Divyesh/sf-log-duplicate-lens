@@ -1,0 +1,28 @@
+[package]
+name = "log-duplicate-lens"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Quantify suspected cross-stream duplicate ingestion in Loki and JSON logs"
+license = "MIT"
+repository = "https://github.com/B-Divyesh/sf-log-duplicate-lens"
+readme = "../../README.md"
+keywords = ["loki", "logs", "deduplication", "cli"]
+categories = ["command-line-utilities", "development-tools::debugging"]
+
+[[bin]]
+name = "log-duplicate-lens"
+path = "src/main.rs"
+
+[dependencies]
+chrono = { version = "0.4.41", default-features = false, features = ["std"] }
+clap = { version = "4.5.46", features = ["derive"] }
+regex = "1.11.2"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.143"
+
+[dev-dependencies]
+assert_cmd = "2.0.17"
+predicates = "3.1.3"
+tempfile = "3.21.0"
+

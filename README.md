@@ -28,7 +28,7 @@ Analyze a Loki `query_range` JSON response, redact secrets before they enter the
 log-duplicate-lens export.json \
   --format loki \
   --window 1500ms \
-  --redact 'token=[^ ]+=token=[REDACTED]' \
+  --redact 'token=[^ ]+=>token=[REDACTED]' \
   --json > duplicate-report.json
 ```
 
