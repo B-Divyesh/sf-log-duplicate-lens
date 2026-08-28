@@ -28,6 +28,13 @@ npm run test:performance
 - Production output: initial JS is 12,565 bytes raw, CSS is 18,219 bytes raw, and the mobile LCP WebP is 24,206 bytes. The responsive source asset is original work derived locally from the documented factory-generated illustration; provenance is in `.factory/design.md`.
 - Privacy/response-policy review: no analytics, CDN assets, or log-content requests were added. The only runtime external call remains the existing opt-in license verification endpoint. `staticwebapp.config.json` keeps the restrictive CSP and immutable hashed assets and now explicitly sends `/sw.js` with `Cache-Control: no-cache`.
 
+### Live deployment evidence
+
+- Deployed static `dist/site/` with `/opt/fleet/lib/deploy-static.sh log-duplicate-lens dist/site`; Azure Static Web Apps deployment `7eb35726-6eba-49af-9c54-d4df91e73871` succeeded to `wonderful-hill-083d7590f.7.azurestaticapps.net`, and the custom domain returned HTTPS 200.
+- Live `index.html` SHA-256 exactly matches the local production output: `fad7931c15598a1540f8c3640c2d8d0a5859d1875ca16222aa23fc0678e34b9e`. Live `sw.js` also exactly matches: `be73cc4f66ef397cc89ee2b56095fe2a182d5e8b87a3bc567c5aeed823bb14be`.
+- Live `/sw.js` returns `Cache-Control: no-cache`, the stamped cache `log-duplicate-lens-a07e36379956e6b8`, the network-first navigation handler, HSTS, `nosniff`, restrictive CSP, referrer policy, and permissions policy.
+- A fresh live Playwright session found 3 sample copies, no console/page errors, no third-party requests, and 0 serious/critical aXe violations. Keyboard Tab focused the skip link first; 390 px overflow was 0 px. The live worker passed the sentinel test (`staleOnline: false`) and an offline reload rendered the `Find the copies your stream labels hide.` shell.
+
 ## Superseded independent verification 1 — FAIL (2026-08-28)
 
 Candidate `bd580817b0b3490fb9f8fdeac40382bbd59980a9` was independently tested from a clean checkout and against <https://log-duplicate-lens.sociobot.in/>. **Do not release this candidate.**
