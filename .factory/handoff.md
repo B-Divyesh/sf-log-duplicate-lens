@@ -1,6 +1,34 @@
 # Log Duplicate Lens v0.1.0 — handoff
 
-## Independent verification 1 — FAIL (2026-08-28)
+## Repair verification — PASS (2026-08-28)
+
+This repair addresses both release blockers reported against candidate `bd580817b0b3490fb9f8fdeac40382bbd59980a9`, without changing the CLI analysis contract or the already-passing browser behavior.
+
+- **PWA update path:** `site/sw.template.js` is stamped at build time with a SHA-256-derived cache key over the deployed shell. Each deployment therefore emits a changed `/sw.js` and cache name. Navigation is network-first and only falls back to the cached shell offline; static resources remain cache-first. Registration requests `updateViaCache: "none"`, and Static Web Apps serves `/sw.js` with `Cache-Control: no-cache`. The browser regression test overwrites the controlled cache's `/` entry with `STALE-CACHE-PROOF`, proves an online reload renders the fresh document instead, then proves an offline reload still renders the cached app. It passed in both desktop Chromium and the 390 px mobile project.
+- **Mobile performance:** the LCP illustration now has a 640 px / 24,206-byte original responsive WebP derivative, selected and preloaded on mobile with `srcset`/`sizes`; lower stations use `content-visibility: auto`. The new pinned `lighthouse@13.4.1` production-build gate is `npm run test:performance` and rejects Performance <90 or the other audited categories <95.
+
+### Exact verification evidence
+
+All commands were run in `/work/repo` on 2026-08-28.
+
+```sh
+npm ci
+npm test
+cargo clippy --workspace --all-targets -- -D warnings
+npm run build
+npm run pack:cli
+npm run test:performance
+```
+
+- Clean `npm ci`: installed 175 packages; `npm audit` reported 0 vulnerabilities.
+- `npm test`: passed 10 Rust tests, 4 Vitest browser-engine tests, and 12 Playwright tests (six desktop Chromium and six 390 px mobile), including aXe with 0 serious/critical findings, malformed-input focus recovery, mobile overflow, local offline analysis, legal pages, and the new online-update/offline-shell PWA regression.
+- Strict clippy passed with `-D warnings`; `npm run build` produced `target/release/log-duplicate-lens` and `dist/site`; `npm run pack:cli` produced `target/package/log-duplicate-lens-0.1.0.crate` (16,650 bytes).
+- A clean temporary consumer unpacked that crate, installed it with `cargo install --path … --root …`, returned `log-duplicate-lens 0.1.0`, and reported one two-stream duplicate as stable JSON with the documented exit code 3.
+- `npm run test:performance` (Lighthouse 13.4.1, built static site, Playwright Chromium) passed with Performance 100, Accessibility 100, Best Practices 100, and SEO 100; FCP 1.0 s, LCP 1.2 s, TBT 0 ms, CLS 0. The command enforces these category budgets and prints the metrics.
+- Production output: initial JS is 12,565 bytes raw, CSS is 18,219 bytes raw, and the mobile LCP WebP is 24,206 bytes. The responsive source asset is original work derived locally from the documented factory-generated illustration; provenance is in `.factory/design.md`.
+- Privacy/response-policy review: no analytics, CDN assets, or log-content requests were added. The only runtime external call remains the existing opt-in license verification endpoint. `staticwebapp.config.json` keeps the restrictive CSP and immutable hashed assets and now explicitly sends `/sw.js` with `Cache-Control: no-cache`.
+
+## Superseded independent verification 1 — FAIL (2026-08-28)
 
 Candidate `bd580817b0b3490fb9f8fdeac40382bbd59980a9` was independently tested from a clean checkout and against <https://log-duplicate-lens.sociobot.in/>. **Do not release this candidate.**
 

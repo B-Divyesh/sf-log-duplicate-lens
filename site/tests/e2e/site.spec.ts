@@ -41,6 +41,38 @@ test("fits the 390px mobile viewport and reports offline mode", async ({ page, c
   await expect(page.locator("#metric-copies")).toHaveText("3");
 });
 
+test("service worker uses the fresh online shell and retains an offline fallback", async ({ page, context }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => "serviceWorker" in navigator);
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  try {
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), undefined, { timeout: 5_000 });
+  } catch {
+    await page.reload();
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+  }
+
+  await page.evaluate(async () => {
+    const cacheName = (await caches.keys()).find((name) => name.startsWith("log-duplicate-lens-"));
+    if (!cacheName) throw new Error("Expected the versioned application cache");
+    const cache = await caches.open(cacheName);
+    await cache.put("/", new Response("<!doctype html><title>STALE-CACHE-PROOF</title><p>STALE-CACHE-PROOF</p>", {
+      headers: { "content-type": "text/html" }
+    }));
+  });
+
+  await page.reload();
+  await expect(page).toHaveTitle(/Log Duplicate Lens/);
+  await expect(page.locator("body")).not.toContainText("STALE-CACHE-PROOF");
+
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.getByRole("heading", { level: 1, name: /Find the copies/ })).toBeVisible();
+  await context.setOffline(false);
+});
+
 test("legal pages are present", async ({ page }) => {
   await page.goto("/privacy/");
   await expect(page.getByRole("heading", { level: 1, name: "Privacy" })).toBeVisible();

@@ -311,7 +311,7 @@ function byId<T extends HTMLElement = HTMLElement>(id: string): T {
 }
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => undefined));
+  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => undefined));
 }
 
 void initializeLicense();

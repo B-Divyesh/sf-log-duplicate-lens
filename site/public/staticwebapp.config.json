@@ -1,6 +1,7 @@
 {
   "navigationFallback": { "rewrite": "/index.html", "exclude": ["/privacy/*", "/terms/*", "/*.{css,js,webp,svg,json}"] },
   "routes": [
+    { "route": "/sw.js", "headers": { "Cache-Control": "no-cache" } },
     { "route": "/assets/*", "headers": { "Cache-Control": "public, max-age=31536000, immutable" } },
     { "route": "/lens-cutaway.webp", "headers": { "Cache-Control": "public, max-age=604800" } }
   ],

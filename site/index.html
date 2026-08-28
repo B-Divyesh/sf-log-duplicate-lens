@@ -8,7 +8,8 @@
     <title>Log Duplicate Lens — see cross-stream log amplification</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="preload" href="/lens-cutaway.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="/lens-cutaway-640.webp" as="image" type="image/webp" media="(max-width: 940px)" fetchpriority="high" />
+    <link rel="preload" href="/lens-cutaway.webp" as="image" type="image/webp" media="(min-width: 941px)" fetchpriority="high" />
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
@@ -51,7 +52,10 @@
           </ul>
         </div>
         <figure class="hero-instrument">
-          <img src="/lens-cutaway.webp" width="1280" height="853" alt="Cutaway illustration of three log signal traces converging through a lens into one paper-chart pulse" fetchpriority="high" />
+          <picture>
+            <source media="(max-width: 940px)" srcset="/lens-cutaway-640.webp" type="image/webp" />
+            <img src="/lens-cutaway.webp" width="1280" height="853" alt="Cutaway illustration of three log signal traces converging through a lens into one paper-chart pulse" fetchpriority="high" />
+          </picture>
           <figcaption>Three observed stream traces · one probable logical event</figcaption>
         </figure>
       </section>

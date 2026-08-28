@@ -57,14 +57,15 @@ A group is a **suspected amplification cluster**, not proof of bad ingestion. Le
 Requirements: Rust 1.85+, Node 22+, and npm 10+.
 
 ```sh
-npm install
+npm ci
 npm run dev
 npm test
 npm run build
 npm run pack:cli
+npm run test:performance
 ```
 
-`npm run build` produces the release binary under `target/release/` and the deployable static site at `dist/site/`. `npm run pack:cli` runs `cargo package` without publishing.
+`npm run build` produces the release binary under `target/release/` and the deployable static site at `dist/site/`. The site build stamps a content-derived service-worker cache key, uses network-first document navigation with an offline shell fallback, and sends `sw.js` with `Cache-Control: no-cache` on Static Web Apps. `npm run pack:cli` runs `cargo package` without publishing. `npm run test:performance` runs reproducible mobile Lighthouse against the production build and requires Performance ≥90 and the other audited categories ≥95.
 
 ## Privacy
 
