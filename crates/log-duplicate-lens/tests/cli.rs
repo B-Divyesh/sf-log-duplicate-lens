@@ -47,3 +47,15 @@ fn malformed_input_uses_exit_two() {
         .code(2)
         .stderr(predicate::str::contains("invalid JSON on line 1"));
 }
+
+#[test]
+fn claim_cli_demo_runs_without_an_input_path() {
+    Command::cargo_bin("log-duplicate-lens")
+        .unwrap()
+        .arg("demo")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("7 labeled log records"))
+        .stdout(predicate::str::contains("2 suspected duplicate groups / 3 duplicate copies"))
+        .stdout(predicate::str::contains("Demo report:"));
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "id": "sample-analysis",
+    "claim": "The sample shows two suspected duplicate groups and three duplicate copies",
+    "where": "landing action, demo readout",
+    "test": "npx playwright test --project=chromium --grep @claim:sample-analysis",
+    "sandbox": "fresh browser context opens /demo and observes the bundled result"
+  },
+  {
+    "id": "demo-isolation",
+    "claim": "Demo sample data is not saved with normal data",
+    "where": "demo banner, README, privacy",
+    "test": "npx playwright test --project=chromium --grep @claim:demo-isolation",
+    "sandbox": "fresh /demo context asserts only the demo: storage key exists before and after reset"
+  },
+  {
+    "id": "demo-private",
+    "claim": "The demo makes no off-origin requests",
+    "where": "privacy notice",
+    "test": "npx playwright test --project=chromium --grep @claim:demo-private",
+    "sandbox": "fresh /demo context records every request and permits only the local origin"
+  },
+  {
+    "id": "json-export",
+    "claim": "The demo exports its observed report as JSON",
+    "where": "Export JSON evidence button",
+    "test": "npx playwright test --project=chromium --grep @claim:json-export",
+    "sandbox": "fresh /demo context downloads the report and asserts its observed groups and copies"
+  },
+  {
+    "id": "browser-limit",
+    "claim": "The browser reads up to 5 MB",
+    "where": "landing workbench",
+    "test": "npx playwright test --project=chromium --grep @claim:browser-limit",
+    "sandbox": "fresh home context selects a 5 MB plus one byte file and observes the limit error"
+  },
+  {
+    "id": "offline-demo",
+    "claim": "The browser demo can run offline after the site has loaded",
+    "where": "privacy notice",
+    "test": "npx playwright test --project=chromium --grep @claim:offline-demo",
+    "sandbox": "fresh /demo context goes offline after first load, resets, and observes the result"
+  },
+  {
+    "id": "cli-demo",
+    "claim": "The CLI demo reads a bundled seven-record sample and writes a temporary report",
+    "where": "landing CLI demo, README",
+    "test": "cargo test --test cli claim_cli_demo_runs_without_an_input_path",
+    "sandbox": "test binary runs log-duplicate-lens demo with no input path and observes its sample/result/output-path text"
+  }
+]

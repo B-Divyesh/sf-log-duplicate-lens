@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "cargo build --release && npm run build:site",
-    "build:site": "tsc --noEmit && vite build && node scripts/build-service-worker.mjs",
+    "build:site": "tsc --noEmit && vite build && node scripts/build-service-worker.mjs && node scripts/build-routes.mjs",
     "test": "cargo test --workspace && vitest run src/analyzer.test.ts --globals && playwright test",
     "test:unit": "cargo test --workspace && vitest run src/analyzer.test.ts --globals",
     "test:e2e": "playwright test",

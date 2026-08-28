@@ -31,6 +31,15 @@
   display: none !important;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 88px;
@@ -158,6 +167,45 @@ footer nav {
   display: flex;
   align-items: center;
   gap: 24px;
+}
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(1180px, calc(100% - 40px));
+  margin: 12px auto 0;
+  padding: 10px 14px;
+  border: 1px solid #9a520e;
+  background: #fff4d8;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-actions button {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.action-note {
+  max-width: 15ch;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 .site-header nav a {
@@ -1127,10 +1175,6 @@ footer nav a {
 }
 
 @media (max-width: 940px) {
-  .site-header nav a:not(.nav-cta) {
-    display: none;
-  }
-
   .hero {
     grid-template-columns: 1fr;
     gap: 46px;
@@ -1189,7 +1233,11 @@ footer nav a {
 
   .site-header {
     width: calc(100% - 32px);
-    min-height: 76px;
+    min-height: 0;
+    padding: 14px 0;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .wordmark svg {
@@ -1202,11 +1250,16 @@ footer nav a {
   }
 
   .site-header nav {
-    gap: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    gap: 4px;
   }
 
-  .site-header .nav-cta {
-    padding: 0 10px;
+  .site-header nav a {
+    justify-content: center;
+    min-height: 44px;
+    font-size: 12px;
   }
 
   .hero {
@@ -1225,6 +1278,17 @@ footer nav a {
 
   .hero-actions .button {
     width: 100%;
+  }
+
+  .action-note {
+    max-width: none;
+    width: 100%;
+  }
+
+  .demo-banner {
+    width: calc(100% - 32px);
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .assurance-list {

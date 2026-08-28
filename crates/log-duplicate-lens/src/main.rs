@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::{self, BufReader, Write};
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 enum FormatArg {
@@ -104,6 +105,9 @@ struct Cli {
 }
 
 fn main() -> ExitCode {
+    if std::env::args().nth(1).as_deref() == Some("demo") {
+        return run_demo();
+    }
     let cli = Cli::parse();
     match run(&cli) {
         Ok(report) => {
@@ -131,6 +135,45 @@ fn main() -> ExitCode {
             ExitCode::from(2)
         }
     }
+}
+
+/// Run the bundled labeled sample without requiring an input path.
+///
+/// The report is deliberately written to a new temporary file so a trial
+/// cannot overwrite an operator's own report or input.
+fn run_demo() -> ExitCode {
+    let config = AnalysisConfig::default();
+    let report = match analyze_reader(
+        std::io::Cursor::new(include_str!("../examples/labeled-sample.jsonl")),
+        InputFormat::Jsonl,
+        &config,
+    ) {
+        Ok(report) => report,
+        Err(error) => {
+            eprintln!("lens: bundled demo could not run: {error}");
+            return ExitCode::from(1);
+        }
+    };
+    let stamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_millis())
+        .unwrap_or_default();
+    let path = std::env::temp_dir().join(format!("log-duplicate-lens-demo-{stamp}.json"));
+    let json = match serde_json::to_string_pretty(&report) {
+        Ok(json) => json,
+        Err(error) => {
+            eprintln!("lens: could not encode demo report: {error}");
+            return ExitCode::from(1);
+        }
+    };
+    if let Err(error) = std::fs::write(&path, json) {
+        eprintln!("lens: could not write demo report: {error}");
+        return ExitCode::from(1);
+    }
+    println!("Bundled sample: 7 labeled log records");
+    println!("Result: {} suspected duplicate groups / {} duplicate copies", report.suspected_groups, report.duplicate_copies);
+    println!("Demo report: {}", path.display());
+    ExitCode::SUCCESS
 }
 
 fn run(cli: &Cli) -> Result<AnalysisReport, LensError> {
