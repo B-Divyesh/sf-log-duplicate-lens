@@ -144,6 +144,14 @@ test("has no serious accessibility violations and one h1", async ({ page }) => {
   await expect(page.locator("main")).toHaveCount(1);
 });
 
+test("demo evidence pane remains keyboard-accessible", async ({ page }) => {
+  await page.goto("/demo");
+  await expect(page.locator("#evidence")).toBeVisible();
+  await expect(page.locator("#evidence")).toHaveAttribute("tabindex", "0");
+  const results = await new AxeBuilder({ page: page as never }).analyze();
+  expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
+});
+
 test("fits a 390px viewport with Demo and Privacy navigation", async ({ page }) => {
   await page.goto("/");
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
