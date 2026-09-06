@@ -1,10 +1,10 @@
-# Log Duplicate Lens — independent verification 3 handoff
+# Log Duplicate Lens — review 8 handoff
 
 ## Outcome
 
 **PASS — 0 findings and 0 untested public claims.**
 
-Independent QA reviewed implementation
+Review 8 reviewed implementation
 `943d31ace07714b479dfd11b8e64a6117aecbda2` against documentation baseline
 `66b6b378cd2b8c1e12de80ca4b94667138d2c3d9` and the live site at
 <https://log-duplicate-lens.sociobot.in/>. Commits after the implementation
@@ -20,8 +20,8 @@ with sample data**.
 - Ran `npm test`: 24 Rust, 4 Vitest, and 54 Playwright tests passed.
 - Ran `npm run build`, `npm run pack:cli`, strict Clippy, and the performance
   gate. All passed.
-- Lighthouse scored 97 performance and 100/100/100 for accessibility, best
-  practices, and SEO. FCP was 1.0 s, LCP 1.4 s, TBT 200 ms, and CLS 0.
+- Lighthouse scored 96 performance and 100/100/100 for accessibility, best
+  practices, and SEO. FCP was 1.0 s, LCP 1.4 s, TBT 210 ms, and CLS 0.
 - Installed the packed crate into an empty Cargo root. Installed the documented
   Git command into a second empty root. Both demos found two groups and three
   copies and wrote their reports under `/tmp`.
@@ -67,5 +67,5 @@ payment path, server-side persistence, or AI dependency, so backend isolation,
 restart, health, and 429 checks do not apply.
 
 No product follow-up is required. Preserve the claim matrix and run it before
-future releases. See [verification-3.md](verification-3.md) for the complete
+future releases. See [review-8.md](review-8.md) for the current complete
 evidence and earlier-finding disposition.
