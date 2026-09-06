@@ -10,7 +10,7 @@ Try the browser sample at <https://log-duplicate-lens.sociobot.in/demo>.
 
 ## Install
 
-Build the single Rust binary from this checkout:
+Install the CLI from this checkout:
 
 ```sh
 cargo install --path crates/log-duplicate-lens
@@ -33,8 +33,11 @@ file. The command prints that file path.
 log-duplicate-lens loki.jsonl
 ```
 
-Use `--format loki` for a Loki query response. Use `--window 1500ms` to set
-the retry window. Add `--json` for a machine-readable report.
+Automatic format checking accepts JSON lines, Loki query responses, and plain
+lines. Use `--format loki` when you want to require a Loki response.
+
+Use `--window 1500ms` to set the retry window. Add `--json` for a
+machine-readable report.
 
 ```sh
 log-duplicate-lens export.json --format loki --window 1500ms --json
@@ -42,7 +45,39 @@ log-duplicate-lens export.json --format loki --window 1500ms --json
 
 Use `--max-events`, `--max-groups`, and `--max-input-mb` to set limits for
 large exports. Use `--redact 'token=[^ ]+=>token=[REDACTED]'` before sharing a
-report.
+report. Redaction covers message, label, timing, and evidence text in reports.
+
+## Match changing messages
+
+Default matching ignores changing UUIDs, IP addresses, embedded timestamps,
+and numbers with four or more digits. Use `--normalize none` to compare the
+literal message text.
+
+Add `--normalize-rule 'request=[^ ]+=>request=<id>'` to rewrite a changing
+message fragment before matching. Repeat the option for more rewrites.
+
+Use `--ignore-label pod` when a changing label should not define a separate
+stream. Ignored labels are also omitted from reported stream evidence.
+
+## Map custom JSON lines
+
+Use `--message-field`, `--timestamp-field`, and `--stream-field` when your
+JSON lines use different field names.
+
+```sh
+log-duplicate-lens custom.jsonl \
+  --message-field body --timestamp-field when --stream-field source_labels
+```
+
+## Read standard input
+
+The CLI reads standard input when the input path is `-`.
+
+```sh
+printf '%s\n' '{"ts":1700000000000,"msg":"retry 12345","stream":{"shard":"a"}}' \
+  '{"ts":1700000000100,"msg":"retry 67890","stream":{"shard":"b"}}' \
+  | log-duplicate-lens - --format jsonl --json
+```
 
 ## What a result means
 
@@ -70,5 +105,8 @@ order. `npm run pack:cli` prepares a crate but does not publish it.
 The browser demo uses its own `demo:` local-storage key. Resetting reruns the
 sample. Leaving the demo removes that key. See the [privacy notice](https://log-duplicate-lens.sociobot.in/privacy/)
 and [terms](https://log-duplicate-lens.sociobot.in/terms/).
+
+The CLI makes no network requests. It does not upload log content or emit
+telemetry.
 
 MIT © 2026 Sociobot (Param Factory). See [LICENSE](LICENSE).

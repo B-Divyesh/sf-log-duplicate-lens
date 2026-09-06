@@ -29,7 +29,7 @@
     <p class="sr-only" id="route-announcer" aria-live="polite"></p>
     <div class="network-strip" id="network-strip" role="status">
       <span class="status-lamp" aria-hidden="true"></span>
-      <span id="network-label">Local circuit ready · nothing uploaded</span>
+      <span id="network-label">Runs locally · nothing uploaded</span>
     </div>
     <header class="site-header">
       <a class="wordmark" href="/" aria-label="Log Duplicate Lens home">
@@ -55,19 +55,19 @@
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span>Instrument 04</span> Find duplicate logs across streams</p>
+          <p class="eyebrow">Duplicate log checker</p>
           <h1 id="hero-title" tabindex="-1">Find duplicate Loki logs across streams</h1>
           <p class="lede">For Loki operators checking whether duplicate ingestion inflates alerts and storage.</p>
           <div class="hero-actions">
             <a class="button button-primary" href="/demo">Try it with sample data</a>
             <span class="action-note">See two duplicate groups now.</span>
-            <a class="button button-secondary" href="#install">Install the CLI</a>
           </div>
           <ul class="assurance-list" aria-label="Product assurances">
             <li><span aria-hidden="true">●</span> Processes samples in this browser</li>
             <li><span aria-hidden="true">●</span> Browser input limit: 5 MB</li>
             <li><span aria-hidden="true">●</span> Evidence, not verdicts</li>
           </ul>
+          <a class="button button-secondary hero-install" href="#install">Install the CLI</a>
         </div>
         <figure class="hero-instrument">
           <picture>
@@ -78,7 +78,7 @@
         </figure>
       </section>
 
-      <section class="calibration-band" aria-label="How Lens works">
+      <section class="calibration-band" aria-label="How the checker works">
         <ol>
           <li><span>01</span><strong>Read messages</strong><small>Ignore changing request IDs when matching messages</small></li>
           <li><span>02</span><strong>Set a retry window</strong><small>Match retry timing</small></li>
@@ -89,14 +89,14 @@
 
       <section class="workbench-section" id="workbench" aria-labelledby="workbench-title">
         <div class="section-heading">
-          <p class="eyebrow">Bench test · browser edition</p>
+          <p class="eyebrow">Browser log checker</p>
           <h2 id="workbench-title">Check a log sample</h2>
           <p>Paste JSON lines, a Loki response, or plain lines. The browser reads up to 5 MB.</p>
         </div>
 
         <div class="workbench">
           <div class="input-bay">
-            <div class="bay-label"><span>Input A</span><span class="privacy-scope">Local circuit</span></div>
+            <div class="bay-label"><span>Log input</span><span class="privacy-scope">Runs in this browser</span></div>
             <label for="log-input">Log sample</label>
             <textarea id="log-input" spellcheck="false" aria-describedby="input-help input-error" placeholder='{"ts": 1700000000000, "msg": "timeout id=12345", "stream": {"shard": "a"}}'></textarea>
             <p class="field-help" id="input-help">Remove sensitive values from this input before exporting.</p>
@@ -119,7 +119,7 @@
           </div>
 
           <div class="output-bay" aria-labelledby="readout-title">
-            <div class="bay-label"><span id="readout-title">Readout B</span><span id="readout-state">Awaiting sample</span></div>
+            <div class="bay-label"><span id="readout-title">Results</span><span id="readout-state">Awaiting sample</span></div>
             <div class="readout" id="results" aria-live="polite" aria-busy="false">
               <div class="empty-readout" id="empty-readout">
                 <svg aria-hidden="true" viewBox="0 0 280 90">
@@ -129,7 +129,7 @@
                   <circle cx="140" cy="45" r="18" />
                   <path class="trace output-trace" d="M158 45h40l8-16 12 34 11-18h49" />
                 </svg>
-                <strong>No sample on the bench</strong>
+                <strong>No log sample yet</strong>
                 <p>Show the sample result or choose a log export.</p>
               </div>
               <div class="metrics" id="metrics" hidden>
@@ -150,7 +150,7 @@
       <section class="interpretation" aria-labelledby="interpretation-title">
         <div>
           <p class="eyebrow">How to assess a suspected duplicate</p>
-          <h2 id="interpretation-title">What the readout can—and cannot—tell you</h2>
+          <h2 id="interpretation-title">What results show</h2>
         </div>
         <div class="dial-list">
           <article><span class="dial dial-strong" aria-hidden="true"></span><h3>Evidence for a duplicate</h3><p>Look for matching message text across streams within the retry window.</p></article>
@@ -161,12 +161,12 @@
 
       <section class="install-section" id="install" aria-labelledby="install-title">
         <div class="section-heading inverse">
-          <p class="eyebrow">Single binary</p>
-          <h2 id="install-title">Put the lens beside your logs</h2>
+          <p class="eyebrow">Command-line tool</p>
+          <h2 id="install-title">Install the CLI</h2>
           <p>Run the bundled sample before pointing the tool at a log export.</p>
         </div>
         <div class="terminal-shell">
-          <div class="terminal-top"><span>LOCAL / OPERATOR</span><span>UTF-8</span></div>
+          <div class="terminal-top"><span>LOCAL CLI</span><span>UTF-8</span></div>
           <pre><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-log-duplicate-lens
 log-duplicate-lens demo</code></pre>
           <button class="copy-button" id="copy-button" type="button" aria-label="Copy install command">Copy install command</button>

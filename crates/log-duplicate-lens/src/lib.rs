@@ -303,7 +303,7 @@ pub fn analyze_reader<R: BufRead>(
             .push("Resource limits truncated this analysis; totals are sample estimates.".into());
     }
 
-    Ok(AnalysisReport {
+    let mut report = AnalysisReport {
         schema_version: 1,
         input_format: detected.to_string(),
         observed_events: observed,
@@ -319,7 +319,9 @@ pub fn analyze_reader<R: BufRead>(
         estimated_extra_bytes,
         groups: result_groups,
         cautions,
-    })
+    };
+    redact_report_strings(&mut report, config);
+    Ok(report)
 }
 
 fn detect_format(input: &str, requested: InputFormat) -> InputFormat {
@@ -589,19 +591,66 @@ fn normalize_message(message: &str, config: &AnalysisConfig) -> String {
 }
 
 fn redact_preview(message: &str, config: &AnalysisConfig) -> String {
-    let mut preview = message.to_string();
-    for rule in &config.redaction_rules {
-        preview = rule
-            .regex
-            .replace_all(&preview, rule.replacement.as_str())
-            .into_owned();
-    }
+    let preview = redact_text(message, config);
     let mut chars = preview.chars();
     let shortened: String = chars.by_ref().take(220).collect();
     if chars.next().is_some() {
         format!("{shortened}…")
     } else {
         shortened
+    }
+}
+
+fn redact_text(value: &str, config: &AnalysisConfig) -> String {
+    config
+        .redaction_rules
+        .iter()
+        .fold(value.to_string(), |redacted, rule| {
+            rule.regex
+                .replace_all(&redacted, rule.replacement.as_str())
+                .into_owned()
+        })
+}
+
+/// Apply report redaction after all comparison work is complete. Comparison
+/// intentionally uses the original data, but no user-derived string should
+/// survive into a report that an operator may share.
+fn redact_report_strings(report: &mut AnalysisReport, config: &AnalysisConfig) {
+    if config.redaction_rules.is_empty() {
+        return;
+    }
+
+    for group in &mut report.groups {
+        // Message previews were redacted before they were shortened.
+        group.first_timestamp = redact_text(&group.first_timestamp, config);
+        group.last_timestamp = redact_text(&group.last_timestamp, config);
+
+        group.streams = group
+            .streams
+            .iter()
+            .map(|labels| {
+                labels
+                    .iter()
+                    .map(|(key, value)| (redact_text(key, config), redact_text(value, config)))
+                    .collect()
+            })
+            .collect();
+
+        let mut differing_labels: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        for (key, values) in std::mem::take(&mut group.differing_labels) {
+            let key = redact_text(&key, config);
+            let entry = differing_labels.entry(key).or_default();
+            entry.extend(values.iter().map(|value| redact_text(value, config)));
+        }
+        group.differing_labels = differing_labels
+            .into_iter()
+            .map(|(key, values)| (key, values.into_iter().collect()))
+            .collect();
+        group.evidence = group
+            .evidence
+            .iter()
+            .map(|value| redact_text(value, config))
+            .collect();
     }
 }
 
@@ -760,9 +809,9 @@ mod tests {
     #[test]
     fn redacts_before_report_but_keeps_detection() {
         let input = concat!(
-            r#"{"ts":1700000000000,"msg":"failed token=secret","labels":{"pod":"a"}}"#,
+            r#"{"ts":1700000000000,"msg":"failed token=secret","labels":{"tenant":"token=secret","token=secret":"kept","pod":"a"}}"#,
             "\n",
-            r#"{"ts":1700000000100,"msg":"failed token=secret","labels":{"pod":"b"}}"#,
+            r#"{"ts":1700000000100,"msg":"failed token=secret","labels":{"tenant":"token=secret","token=secret":"kept","pod":"b"}}"#,
             "\n"
         );
         let mut config = AnalysisConfig::default();
@@ -772,6 +821,9 @@ mod tests {
         let report = analyze_reader(Cursor::new(input), InputFormat::Jsonl, &config).unwrap();
         assert_eq!(report.suspected_groups, 1);
         assert!(!report.groups[0].message_preview.contains("secret"));
+        let serialized = serde_json::to_string(&report).unwrap();
+        assert!(!serialized.contains("token=secret"));
+        assert!(serialized.contains("token=[REDACTED]"));
     }
 
     #[test]

@@ -63,7 +63,7 @@ struct Cli {
     #[arg(long = "normalize-rule", value_parser = parse_rule)]
     normalization_rules: Vec<RewriteRule>,
 
-    /// Redact report previews as REGEX=>REPLACEMENT; repeatable
+    /// Redact user-derived report text as REGEX=>REPLACEMENT; repeatable
     #[arg(long, value_parser = parse_rule)]
     redact: Vec<RewriteRule>,
 
@@ -171,7 +171,10 @@ fn run_demo() -> ExitCode {
         return ExitCode::from(1);
     }
     println!("Bundled sample: 7 labeled log records");
-    println!("Result: {} suspected duplicate groups / {} duplicate copies", report.suspected_groups, report.duplicate_copies);
+    println!(
+        "Result: {} suspected duplicate groups / {} duplicate copies",
+        report.suspected_groups, report.duplicate_copies
+    );
     println!("Demo report: {}", path.display());
     ExitCode::SUCCESS
 }

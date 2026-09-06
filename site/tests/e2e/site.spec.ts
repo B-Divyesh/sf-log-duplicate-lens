@@ -46,6 +46,26 @@ test("@claim:demo-mobile-result a sample click keeps the sandbox notice and resu
   }
 });
 
+test("phone first screen shows the job, audience, action, and all three facts", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const required = [
+    page.getByRole("heading", { name: "Find duplicate Loki logs across streams", level: 1 }),
+    page.getByText("For Loki operators checking whether duplicate ingestion inflates alerts and storage."),
+    page.getByRole("link", { name: "Try it with sample data" }),
+    page.getByText("Processes samples in this browser"),
+    page.getByText("Browser input limit: 5 MB"),
+    page.getByText("Evidence, not verdicts")
+  ];
+  for (const locator of required) {
+    await expect(locator).toBeVisible();
+    const box = await locator.boundingBox();
+    expect(box, "required first-screen item must have a box").not.toBeNull();
+    expect(box!.y).toBeGreaterThanOrEqual(0);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(844);
+  }
+});
+
 test("@claim:browser-sample-action Show sample result analyzes the sample immediately", async ({ page }) => {
   await page.goto("/");
   const action = page.getByRole("button", { name: "Show sample result" });
@@ -254,6 +274,10 @@ test("uses Retry window and Copy install command consistently", async ({ page })
   await expect(page.getByText("Set a retry window")).toBeVisible();
   await expect(page.getByRole("group", { name: "Retry window" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy install command" })).toBeVisible();
+  await expect(page.getByText("Browser log checker")).toBeVisible();
+  await expect(page.getByText("Log input")).toBeVisible();
+  await expect(page.getByText("Results", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Install the CLI" })).toBeVisible();
 });
 
 test("ships local touch and social assets with their declared dimensions", async ({ page }) => {
@@ -297,7 +321,7 @@ test("routes expose separate titles and a designed not-found page", async ({ pag
   await expect(page).toHaveTitle("Page not found — Log Duplicate Lens");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://log-duplicate-lens.sociobot.in/404/");
   await expect(page.locator("#route-announcer")).toHaveText("Page not found — Log Duplicate Lens");
-  await expect(page.getByRole("heading", { name: "This instrument page is not here" })).toBeFocused();
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeFocused();
   await expect(page.locator("footer")).toContainText("Built by Param Factory · v0.1.0");
   await expect(page.locator("footer").getByRole("link", { name: "View source code" })).toHaveAttribute("href", "https://github.com/B-Divyesh/sf-log-duplicate-lens");
   await page.goBack();

@@ -168,7 +168,7 @@ function positionDemoResult(): void {
 
 function updateNetwork(): void {
   const label = byId("network-label"); const strip = byId("network-strip");
-  label.textContent = navigator.onLine ? "Local circuit ready · nothing uploaded" : "Offline · analysis and export still work locally";
+  label.textContent = navigator.onLine ? "Runs locally · nothing uploaded" : "Offline · analysis and export still work locally";
   strip.classList.toggle("offline", !navigator.onLine);
 }
 window.addEventListener("online", updateNetwork); window.addEventListener("offline", updateNetwork); updateNetwork();
