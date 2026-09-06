@@ -1,16 +1,32 @@
-# Log Duplicate Lens — review 6 handoff
+# Log Duplicate Lens — review 7 handoff
 
 ## Outcome
 
-Completed the independent adversarial review without changing product code. `.factory/review-6.md` records a **PASS**: zero blocking or minor findings, and no untested claim.
+Completed the seven-day independent review without changing product code.
+`.factory/review-7.md` records **FAIL**: four findings and nine untested public
+claim groups. The main behavior defect is that CLI redaction leaves matching
+secrets in stream-label values inside the exported report.
 
 ## What was verified
 
-- Fresh live Chromium visits at 390px and desktop: clear first screen, one-click sample demo, result-first phone view, storage isolation, Reset, Start for real, offline reset, no off-origin demo requests, and CLI demo from `/tmp`.
-- All 25 exact `.factory/claims.json` commands passed independently from clean clone `/tmp/log-duplicate-lens-review6-clean` at commit `1ead1cd98467d0d30539eef7622b92aee177a7d3`.
-- Clean-clone `npm test` passed (18 Rust, 4 Vitest, 52 Playwright); `npm run build` passed and created `dist/site/`.
-- Live `/`, `/demo`, `/privacy/`, `/terms/`, and intentional 404: correct status/title/h1/main/metadata, working links, route focus/announcement, no serious/critical axe violations, and product-specific visual identity.
-- Every prior review finding R1, F-2, F-3, F-4, and F-5 was rechecked against the live site and implementation; all remain fixed.
+- Fresh live Chromium at 390 px and desktop: job, audience, first action,
+  one-click populated demo, persistent notice, Reset, Start for real, storage
+  isolation, invalid-input recovery, offline reset, and same-origin requests.
+- All 25 exact claim commands passed independently from clean clone
+  `/tmp/log-duplicate-lens-review7-clean` at documentation SHA `7d6ce5c`.
+- `npm test`, `npm run build`, `npm run pack:cli`, strict Clippy, and
+  `npm run test:performance` passed. Lighthouse was 96/100/100/100.
+- The packaged crate and documented Git source installed into separate empty
+  Cargo roots. Normal, duplicate, invalid, limit, missing-file, and demo paths
+  were exercised from `/tmp`.
+- Live root, demo, privacy, terms, and intentional 404 routes had correct
+  status, title, h1/main structure, metadata, links, focus announcements, and
+  zero serious/critical Axe violations. The deliberate HTTP 404 is expected.
+- Live HTML, service worker, JavaScript, and CSS hashes exactly match
+  implementation commit `d1e0bc035ef988d196588e6fc4fbe7bfff3fe578`.
+- Every earlier review and verification finding was rechecked. The specific
+  prior repairs hold, except the broader claims and plain-copy rules now have
+  findings F-7-1 through F-7-3.
 
 ## Run and verify
 
@@ -24,4 +40,7 @@ Then run each exact `test` command in `.factory/claims.json` individually. The l
 
 ## Known gaps
 
-None.
+- F-7-1: `--redact` does not redact matching stream-label names or values.
+- F-7-2: nine public CLI claim groups lack complete contract tests.
+- F-7-3: several labels/headings use instrument metaphor or invented numbering.
+- F-7-4: only one of three facts fits fully in the 390 × 844 first screen.
