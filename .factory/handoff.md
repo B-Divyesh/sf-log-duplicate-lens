@@ -1,46 +1,64 @@
-# Log Duplicate Lens — review 7 handoff
+# Log Duplicate Lens — repair 2 handoff
 
 ## Outcome
 
-Completed the seven-day independent review without changing product code.
-`.factory/review-7.md` records **FAIL**: four findings and nine untested public
-claim groups. The main behavior defect is that CLI redaction leaves matching
-secrets in stream-label values inside the exported report.
+Review-7 is closed with no known product defect. The implementation commit is
+`943d31ace07714b479dfd11b8e64a6117aecbda2`. The documentation and verification
+evidence commit is `70d5c5a077c54ad4a2491c1c0541774f0b4077c7`.
 
-## What was verified
+The job is to find suspected duplicate Loki logs across streams. It is for Loki
+operators checking inflated alerts and storage. The first action is **Try it
+with sample data**.
 
-- Fresh live Chromium at 390 px and desktop: job, audience, first action,
-  one-click populated demo, persistent notice, Reset, Start for real, storage
-  isolation, invalid-input recovery, offline reset, and same-origin requests.
-- All 25 exact claim commands passed independently from clean clone
-  `/tmp/log-duplicate-lens-review7-clean` at documentation SHA `7d6ce5c`.
-- `npm test`, `npm run build`, `npm run pack:cli`, strict Clippy, and
-  `npm run test:performance` passed. Lighthouse was 96/100/100/100.
-- The packaged crate and documented Git source installed into separate empty
-  Cargo roots. Normal, duplicate, invalid, limit, missing-file, and demo paths
-  were exercised from `/tmp`.
-- Live root, demo, privacy, terms, and intentional 404 routes had correct
-  status, title, h1/main structure, metadata, links, focus announcements, and
-  zero serious/critical Axe violations. The deliberate HTTP 404 is expected.
-- Live HTML, service worker, JavaScript, and CSS hashes exactly match
-  implementation commit `d1e0bc035ef988d196588e6fc4fbe7bfff3fe578`.
-- Every earlier review and verification finding was rechecked. The specific
-  prior repairs hold, except the broader claims and plain-copy rules now have
-  findings F-7-1 through F-7-3.
+## What changed
 
-## Run and verify
+- CLI redaction now covers all user-derived report text, including label names,
+  label values, differing-label evidence, timestamps, and evidence lines.
+- The 31-claim registry now covers every public CLI behavior. New outcome tests
+  cover automatic input detection, default normalization, custom rewrites,
+  ignored labels, custom field mappings, standard input, proxy capture, and
+  actual group/input limits.
+- Removed the public single-binary claim. Rewrote metaphor labels into direct
+  product language, including the 404 page.
+- Kept the install action after the three first-screen facts on phone. The
+  390 × 844 live bounds place all required first-screen content above 605 px.
+
+## Verification
+
+From fresh remote checkout `/tmp/log-duplicate-lens-repair-14DUOR`:
 
 ```sh
 npm ci
+# every exact .factory/claims.json command, separately
 npm test
 npm run build
+npm run pack:cli
+cargo clippy --workspace --all-targets -- -D warnings
+npm run test:performance
 ```
 
-Then run each exact `test` command in `.factory/claims.json` individually. The live review target is <https://log-duplicate-lens.sociobot.in> and the CLI demo is `log-duplicate-lens demo` from a temporary directory.
+All 31 claim commands passed. `npm test` passed 24 Rust tests, 4 Vitest tests,
+and 54 Playwright tests. Build and package passed. Lighthouse was 100/100/100/100
+(FCP 0.9 s, LCP 1.2 s, TBT 30 ms, CLS 0).
 
-## Known gaps
+The packaged crate and the documented Git install were each exercised in a
+fresh Cargo root. Both ran the demo. The packaged CLI also passed duplicate
+exit code 3 and malformed-input exit code 2 paths.
 
-- F-7-1: `--redact` does not redact matching stream-label names or values.
-- F-7-2: nine public CLI claim groups lack complete contract tests.
-- F-7-3: several labels/headings use instrument metaphor or invented numbering.
-- F-7-4: only one of three facts fits fully in the 390 × 844 first screen.
+Static deployment succeeded as `cc07872b-9c8a-4629-b474-aada90fa49a8`.
+Live root, demo, privacy, and terms passed `verify-url.sh`. Fresh desktop and
+phone sessions had no console errors or off-origin requests. Axe found no
+serious or critical issue on root, demo, legal routes, or the deliberate
+HTTP-404 page. The service worker rejected a stale online shell and reset the
+demo offline with three copies.
+
+See [verification-3.md](verification-3.md) for artifact hashes, finding
+closures, and detailed live evidence.
+
+## Product boundaries and remaining work
+
+The free local CLI and browser demo are complete. The product intentionally
+reports evidence rather than declaring ingestion wrong. It has no backend,
+tenant data, payment flow, or AI dependency. There is no advertised paid offer
+to register; no billing metadata file is needed. The catalog description is
+verb-first and copied to `/work/.evidence/catalog-description.txt`.
